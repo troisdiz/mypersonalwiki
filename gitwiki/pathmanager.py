@@ -2,6 +2,7 @@ from os.path import join
 from urllib import parse
 
 INDEX_FILE_NAME = 'index.md'
+URL_CHARACTER_SEPARATOR = '/'
 
 
 class PathManager:
@@ -15,7 +16,7 @@ class PathManager:
         # TODO Create object to handle this stuff and make it testable
 
         decoded_url_path = parse.unquote(raw_url_path)
-        path_elts = decoded_url_path.split('/')
+        path_elts = decoded_url_path.split(URL_CHARACTER_SEPARATOR)
         if path_elts[-1] == '':
             # Folder case
             return join(self.base_path, decoded_url_path, INDEX_FILE_NAME)
@@ -24,17 +25,13 @@ class PathManager:
         last_elt = path_elts[-1]
         file_elts = last_elt.split('.')
         extension = file_elts[-1]
-        # print('Extension = #' + extension + '#')
         if len(file_elts) == 1:
             if extension != '':
-                # print("Extension empty")
                 return join(self.base_path, decoded_url_path + '.md')
             else:
                 print("Error !")
         else:
             return join(self.base_path, decoded_url_path)
-        # print('Default Case (' + str(file_elts) + ')')
-        # return join(self.base_path, url)
 
 
 def find_extension(url):
