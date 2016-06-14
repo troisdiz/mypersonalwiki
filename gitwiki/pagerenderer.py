@@ -16,6 +16,8 @@ class PageRenderer:
                                                            'markdown.extensions.toc',
                                                            WikiLinkExtension(base_url='/pages/', end_url='.md')])
         html_path = '<div class=\'breadcrumb\'>path 1</div>'
-        return render_template('base.html',
+        return render_template('index.html',
                                content=html_content,
+                               sidebar="Sidebar Content",
+                               table_of_content="Table of content",
                                path=html_path)

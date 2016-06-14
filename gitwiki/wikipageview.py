@@ -1,5 +1,4 @@
 from flask.views import View
-#from .pagerenderer import PageRenderer
 
 
 class WikiView(View):
