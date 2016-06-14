@@ -8,6 +8,7 @@
 // If you want to recursively match all subfolders, use:
 // 'test/spec/**/*.js'
 
+
 module.exports = function (grunt) {
 
   // Time how long tasks take. Can help when optimizing build times
@@ -15,13 +16,15 @@ module.exports = function (grunt) {
 
   // Automatically load required grunt tasks
   require('jit-grunt')(grunt, {
-    useminPrepare: 'grunt-usemin'
+    useminPrepare: 'grunt-usemin',
+    replace: 'grunt-text-replace'
   });
 
   // Configurable paths
   var config = {
     app: 'app',
-    dist: 'dist'
+    dist: 'dist',
+    stemplates: 'sample-templates'
   };
 
   // Define the configuration for all the tasks
@@ -54,6 +57,10 @@ module.exports = function (grunt) {
       styles: {
         files: ['<%= config.app %>/styles/{,*/}*.css'],
         tasks: ['newer:copy:styles', 'postcss']
+      },
+      templates: {
+        files: ['sample-templates/*.txt'],
+        tasks: ['replace']
       }
     },
 
@@ -117,6 +124,34 @@ module.exports = function (grunt) {
         }]
       },
       server: '.tmp'
+    },
+
+    replace: {
+      base_html: {
+        src: ['<%= config.app %>/index-template.html'],
+        overwrite: false,                 // overwrite matched source files
+        replacements: [
+          {
+            from: "{{ content|safe }}",
+            to: function() {
+              return grunt.file.read('sample-templates/content.txt') 
+            }
+          },
+          {
+            from: "{{ sidebar|safe }}",
+            to: function() {
+              return grunt.file.read('sample-templates/sidebar.txt') 
+            }
+          },
+          {
+            from: "{{ table_of_content|safe }}",
+            to: function() {
+              return grunt.file.read('sample-templates/table_of_content.txt') 
+            }
+          }
+        ],
+        dest: '<%= config.app %>/index.html'
+      }
     },
 
     // Make sure code styles are up to par and there are no obvious mistakes
@@ -392,6 +427,7 @@ module.exports = function (grunt) {
 
     grunt.task.run([
       'clean:server',
+      'replace',
       'wiredep',
       'concurrent:server',
       'postcss',
