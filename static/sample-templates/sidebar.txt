@@ -1,0 +1,5 @@
+Truc
+<ul>
+<li>Sidebar Content</li>
+<li>Sidebar Content</li>
+</ul>
