@@ -24,7 +24,8 @@ module.exports = function (grunt) {
   var config = {
     app: 'app',
     dist: 'dist',
-    stemplates: 'sample-templates'
+    static_path: '/static2/',
+    stemplates: 'sample-templates/'
   };
 
   // Define the configuration for all the tasks
@@ -59,7 +60,7 @@ module.exports = function (grunt) {
         tasks: ['newer:copy:styles', 'postcss']
       },
       templates: {
-        files: ['sample-templates/*.txt'],
+        files: ['<%= config.stemplates %>/*.txt'],
         tasks: ['replace']
       }
     },
@@ -119,7 +120,8 @@ module.exports = function (grunt) {
           src: [
             '.tmp',
             '<%= config.dist %>/*',
-            '!<%= config.dist %>/.git*'
+            '!<%= config.dist %>/.git*',
+            '<%= config.dist %>/index.html'
           ]
         }]
       },
@@ -127,26 +129,53 @@ module.exports = function (grunt) {
     },
 
     replace: {
-      base_html: {
+      dist: {
         src: ['<%= config.app %>/index-template.html'],
         overwrite: false,                 // overwrite matched source files
         replacements: [
           {
-            from: "{{ content|safe }}",
+            from: '{{ content|safe }}',
+            to: '{{ content|safe }}'
+          },
+          {
+            from: '{{ sidebar|safe }}',
+            to: '{{ sidebar|safe }}'
+          },
+          {
+            from: '{{ table_of_content|safe }}',
+            to: '{{ table_of_content|safe }}'
+          },
+          {
+            from: '{{static_path}}',
+            to: '/static2/'
+          }
+        ],
+        dest: '<%= config.app %>/index.html'
+      },
+      server: {
+        src: ['<%= config.app %>/index-template.html'],
+        overwrite: false,                 // overwrite matched source files
+        replacements: [
+          {
+            from: '{{ content|safe }}',
             to: function() {
-              return grunt.file.read('sample-templates/content.txt') 
+              return grunt.file.read(config.stemplates + 'content.txt')
             }
           },
           {
-            from: "{{ sidebar|safe }}",
-            to: function() {
-              return grunt.file.read('sample-templates/sidebar.txt') 
+            from: '{{ sidebar|safe }}',
+            to: function () {
+              return grunt.file.read(config.stemplates + 'sidebar.txt')
             }
           },
           {
-            from: "{{ table_of_content|safe }}",
+            from: '{{static_path}}',
+            to: ''
+          },
+          {
+            from: '{{ table_of_content|safe }}',
             to: function() {
-              return grunt.file.read('sample-templates/table_of_content.txt') 
+              return grunt.file.read('sample-templates/table_of_content.txt')
             }
           }
         ],
@@ -243,6 +272,19 @@ module.exports = function (grunt) {
       app: {
         src: ['<%= config.app %>/index.html'],
         exclude: ['bootstrap.js'],
+        ignorePath: /^(\.\.\/)*\.\./,
+        fileTypes: {
+          html: {
+            replace: {
+              js: '<script src="' + config.static_path + '{{filePath}}"></script>',
+              css: '<link rel="stylesheet" href="' + config.static_path + '{{filePath}}" />'
+            }
+          }
+        }
+      },
+      server: {
+        src: ['<%= config.app %>/index.html'],
+        exclude: ['bootstrap.js'],
         ignorePath: /^(\.\.\/)*\.\./
       },
       sass: {
@@ -281,7 +323,15 @@ module.exports = function (grunt) {
           '<%= config.dist %>',
           '<%= config.dist %>/images',
           '<%= config.dist %>/styles'
-        ]
+        ],
+        blockReplacements: {
+          js: function (block) {
+            return '<script  src="' + config.static_path + block.dest + '"></script>';
+          },
+          css: function (block) {
+            return '<link rel="stylesheet" href="' + config.static_path + block.dest + '"/>'
+          }
+        }
       },
       html: ['<%= config.dist %>/{,*/}*.html'],
       css: ['<%= config.dist %>/styles/{,*/}*.css']
@@ -427,8 +477,8 @@ module.exports = function (grunt) {
 
     grunt.task.run([
       'clean:server',
-      'replace',
-      'wiredep',
+      'replace:server',
+      'wiredep:server',
       'concurrent:server',
       'postcss',
       'browserSync:livereload',
@@ -458,6 +508,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'clean:dist',
+    'replace:dist',
     'wiredep',
     'useminPrepare',
     'concurrent:dist',
