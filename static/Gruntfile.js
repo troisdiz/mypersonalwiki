@@ -272,7 +272,7 @@ module.exports = function (grunt) {
       app: {
         src: ['<%= config.app %>/index.html'],
         exclude: ['bootstrap.js'],
-        ignorePath: /^(\.\.\/)*\.\./,
+        ignorePath: /^(\.\.\/)*\.\./ /*,
         fileTypes: {
           html: {
             replace: {
@@ -280,7 +280,7 @@ module.exports = function (grunt) {
               css: '<link rel="stylesheet" href="' + config.static_path + '{{filePath}}" />'
             }
           }
-        }
+        }*/
       },
       server: {
         src: ['<%= config.app %>/index.html'],
@@ -326,11 +326,29 @@ module.exports = function (grunt) {
         ],
         blockReplacements: {
           js: function (block) {
+            //console.log("Block : " + block.dest + " / " + block.startFromRoot + " / " + Object.keys(block));
             return '<script  src="' + config.static_path + block.dest + '"></script>';
           },
           css: function (block) {
             return '<link rel="stylesheet" href="' + config.static_path + block.dest + '"/>'
           }
+        },
+        patterns: {
+          html: [
+            [/<script.+src=['"]\/static2\/([^"']+)["']/gm,
+              'Update the HTML to reference our concat/min/revved js script files beginning with static path',
+              function (m) {
+                return m.replace('/static2/', '');
+              }
+            ],
+            // from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+            [ new RegExp('/<link[^>]+href=[\'\"]' + config.static_path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '([^\"\']+)[\"\']', 'gm'),
+              ///<link[^>]+href=['"]\/static2\/([^"']+)["']/gm,
+              'Update the HTML to reference our concat/min/revved link css beginning with staic path',
+              function (m) {
+                return m.replace('/static2/', '');
+              }]
+          ]
         }
       },
       html: ['<%= config.dist %>/{,*/}*.html'],
