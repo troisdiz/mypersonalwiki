@@ -342,9 +342,9 @@ module.exports = function (grunt) {
               }
             ],
             // from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
-            [ new RegExp('/<link[^>]+href=[\'\"]' + config.static_path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '([^\"\']+)[\"\']', 'gm'),
-              ///<link[^>]+href=['"]\/static2\/([^"']+)["']/gm,
-              'Update the HTML to reference our concat/min/revved link css beginning with staic path',
+            [ //new RegExp('/<link[^>]+href=[\'\"]' + config.static_path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '([^\"\']+)[\"\']', 'gm'),
+              /<link[^>]+href=['"]\/static2\/([^"']+)["']/gm,
+              'Update the HTML to reference our concat/min/revved link css beginning with static path',
               function (m) {
                 return m.replace('/static2/', '');
               }]
