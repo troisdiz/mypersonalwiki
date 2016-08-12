@@ -1,8 +1,7 @@
 import codecs
 from markdown.extensions.wikilinks import WikiLinkExtension
 import markdown
-from flask import render_template
-
+from gitwiki.urlbuilder import url_builder
 
 class PageRenderer:
 
@@ -14,10 +13,7 @@ class PageRenderer:
         text = input_file.read()
         html_content = markdown.markdown(text, extensions=['markdown.extensions.codehilite',
                                                            'markdown.extensions.toc',
-                                                           WikiLinkExtension(base_url='/pages/', end_url='.md')])
-        html_path = '<div class=\'breadcrumb\'>path 1</div>'
-        return render_template('index.html',
-                               content=html_content,
-                               sidebar="Sidebar Content",
-                               table_of_content="Table of content",
-                               path=html_path)
+                                                           WikiLinkExtension(base_url='/pages/',
+                                                                             end_url='.md',
+                                                                             build_url=url_builder)])
+        return html_content

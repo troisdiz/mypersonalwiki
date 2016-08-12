@@ -37,7 +37,7 @@
     <div class="container-fluid">
       <div class="navbar-header navbar-primary" >
         <a class="navbar-brand" href="#">
-          <img alt="Brand" src="...">
+          <!-- <img alt="Brand" src="...">-->
         </a>
         <a class="navbar-brand" href="#">Brand</a>
       </div>
@@ -45,9 +45,7 @@
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ol class="breadcrumb">
-        <li><a href="#">Home</a></li>
-        <li><a href="#">Library</a></li>
-        <li class="active">Data</li>
+        {{ breadcrumb|safe }}
       </ol>
     </div>
   </nav>
