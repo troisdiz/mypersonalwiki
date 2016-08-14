@@ -2,6 +2,8 @@ import codecs
 from markdown.extensions.wikilinks import WikiLinkExtension
 import markdown
 from gitwiki.urlbuilder import url_builder
+from gitwiki.extensions.gitwikilinks import GitWikiLinkExtension
+
 
 class PageRenderer:
 
@@ -13,7 +15,6 @@ class PageRenderer:
         text = input_file.read()
         html_content = markdown.markdown(text, extensions=['markdown.extensions.codehilite',
                                                            'markdown.extensions.toc',
-                                                           WikiLinkExtension(base_url='/pages/',
-                                                                             end_url='.md',
-                                                                             build_url=url_builder)])
+                                                           GitWikiLinkExtension(base_url='/pages/',
+                                                                                end_url='.md')])
         return html_content
