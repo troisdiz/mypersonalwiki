@@ -16,5 +16,5 @@ class PageRenderer:
         html_content = markdown.markdown(text, extensions=['markdown.extensions.codehilite',
                                                            'markdown.extensions.toc',
                                                            GitWikiLinkExtension(base_url='/pages/',
-                                                                                end_url='.md')])
+                                                                                end_url='')])
         return html_content

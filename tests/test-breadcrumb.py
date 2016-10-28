@@ -1,17 +1,17 @@
 import unittest
-from gitwiki.breadcrumbrenderer import BreacrumbRender
+from gitwiki.breadcrumbrenderer import BreadcrumbRender
 
 
 class TestGitWikiBreadcrumbs(unittest.TestCase):
 
     def test_build_tuples_empty(self):
-        bcr = BreacrumbRender('/pages')
+        bcr = BreadcrumbRender('/pages/')
         real = [it for it in bcr.build_tuples([])]
         expected = [([], 'Home')]
         self.print_and_assert(real, expected)
 
     def test_build_tuples_1(self):
-        bcr = BreacrumbRender('/pages')
+        bcr = BreadcrumbRender('/pages/')
         item_name = 'Item1'
         real = [it for it in bcr.build_tuples([item_name])]
         expected = [([], 'Home'), ([item_name], item_name)]
@@ -23,6 +23,6 @@ class TestGitWikiBreadcrumbs(unittest.TestCase):
         self.assertListEqual(real, expected)
 
     def test_render(self):
-        bcr = BreacrumbRender('/pages')
-        self.assertEqual('<li >    <a href="/pages/index.md">Home</a></li>',
+        bcr = BreadcrumbRender('/pages/')
+        self.assertEqual('<li>    <a href="/pages/index">Home</a></li>',
                          bcr.render_path([]))

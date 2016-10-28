@@ -10,16 +10,18 @@ def build_url(label, base, end):
     final_label = clean_label
     if clean_label.endswith('/'):
         final_label = clean_label + "index"
-    return '%s%s%s' % (base, final_label, end)
+
+    if final_label.startswith('/'):
+        # Absolute url
+        return '%s%s%s' % (base, final_label[1:], end)
+    else:
+        # Relative url
+        return '%s%s' % (final_label, end)
 
 
 def build_url_from_paths(paths, base, end):
-    if len(paths) == 0:
-        return build_url('/', base, end)
-    else:
-        return build_url('/'.join(paths) + '/',
-                         base,
-                         end)
+    paths_with_slash = [path + '/' for path in paths]
+    return build_url('/' + '/'.join(paths_with_slash), base, end)
 
 
 class GitWikiLinkExtension(Extension):
@@ -46,6 +48,7 @@ class GitWikiLinkExtension(Extension):
 
 def build_text_link(label):
     return label
+
 
 class GitWikiLinks(Pattern):
     def __init__(self, pattern, config):
