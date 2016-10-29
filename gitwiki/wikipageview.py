@@ -24,9 +24,8 @@ class WikiView(View):
         elif path_info.pathNature == PathNature.other_resource_not_found:
             abort(404)
         elif path_info.pathNature == PathNature.other_resource_file:
-            with open(path_info.path, 'r') as static_file:
-                # TODO mime type
-                send_file(static_file, 'image/png')
+            # TODO mime type
+            return send_file(path_info.path_on_disk, mimetype='image/png')
         elif (path_info.pathNature == PathNature.folder_with_index) | (path_info.pathNature == PathNature.md_file):
             return self.return_wiki_page(path_info.path_on_disk, path_info.url_items)
         elif path_info.pathNature == PathNature.folder_without_index:
