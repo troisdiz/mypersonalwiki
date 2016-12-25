@@ -146,6 +146,10 @@ module.exports = function (grunt) {
             to: '{{ table_of_content|safe }}'
           },
           {
+            from: '{{ breadcrumb|safe }}',
+            to: '{{ breadcrumb|safe }}'
+          },
+          {
             from: '{{static_path}}',
             to: '/static2/'
           }
@@ -176,6 +180,12 @@ module.exports = function (grunt) {
             from: '{{ table_of_content|safe }}',
             to: function() {
               return grunt.file.read('sample-templates/table_of_content.txt')
+            }
+          },
+          {
+            from: '{{ breadcrumb|safe }}',
+            to: function() {
+              return grunt.file.read('sample-templates/breadcrumb.txt')
             }
           }
         ],
