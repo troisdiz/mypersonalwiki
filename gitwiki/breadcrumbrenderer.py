@@ -20,14 +20,15 @@ class BreadcrumbRender:
                                                                      self.base_url,
                                                                      ''),
                                            text=path_item[1])
-                      for path_item in self.build_tuples(path_list)]
+                      for path_item in build_tuples(path_list)]
             return "\n".join(result)
         else:
             return ''
 
-    def build_tuples(self, path_list):
-        current_path = []
-        yield (current_path, 'Home')
-        for path_item in path_list:
-            current_path = current_path + [path_item]
-            yield (current_path, path_item)
+
+def build_tuples(path_list):
+    current_path = []
+    yield (current_path, 'Home')
+    for path_item in path_list:
+        current_path = list(current_path + [path_item])
+        yield (current_path, path_item)
