@@ -23,6 +23,7 @@ if __name__ == "__main__":
                                       breadcrumb_renderer=breadcrumb_renderer)
     static_page_view = StaticView.as_view(name='static_page_view',
                                           path_manager=path_manager)
+    app.add_url_rule(rule='/pages/', view_func=wiki_page_view, defaults={'path': ''})
     app.add_url_rule(rule='/pages/<path:path>', view_func=wiki_page_view)
     app.add_url_rule(rule='/static2/<path:path>', view_func=static_page_view)
 
