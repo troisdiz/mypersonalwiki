@@ -3,13 +3,16 @@ from markdown.inlinepatterns import Pattern
 from markdown.util import etree
 import re
 
+replacements = "".maketrans("àâéèêîôùû", "aaeeeiouu")
+
 
 def build_url(label, base, end):
     """ Build a url from the label, a base, and an end. """
-    clean_label = re.sub(r'([ ]+_)|(_[ ]+)|([ ]+)', '_', label)
+    no_accent = normalize(label)
+    clean_label = re.sub(r'([ ]+_)|(_[ ]+)|([ ]+)', '_', no_accent)
     final_label = clean_label
-    if clean_label.endswith('/'):
-        final_label = clean_label + "index"
+    # if clean_label.endswith('/'):
+    #     final_label = clean_label + "index"
 
     if final_label.startswith('/'):
         # Absolute url
@@ -19,9 +22,14 @@ def build_url(label, base, end):
         return '%s%s' % (final_label, end)
 
 
-def build_url_from_paths(paths, base, end):
-    paths_with_slash = [path + '/' for path in paths]
-    return build_url('/' + '/'.join(paths_with_slash), base, end)
+def build_url_from_paths(paths, base, is_folder):
+    # paths_with_slash = [path + '/' for path in paths]
+    # url = build_url('/' + '/'.join(paths_with_slash), base, end)
+    url = build_url('/' + '/'.join(paths), base, '')
+    if is_folder:
+        if url[-1] != '/':
+            return url + '/'
+    return url
 
 
 class GitWikiLinkExtension(Extension):
@@ -48,6 +56,12 @@ class GitWikiLinkExtension(Extension):
 
 def build_text_link(label):
     return label
+
+
+def normalize(label):
+    """Replace accents with close letter
+    Note : use unidecode"""
+    return label.translate(replacements)
 
 
 class GitWikiLinks(Pattern):

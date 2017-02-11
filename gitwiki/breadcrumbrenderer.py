@@ -18,7 +18,7 @@ class BreadcrumbRender:
 
             result = [self.template.render(link=build_url_from_paths(path_item[0],
                                                                      self.base_url,
-                                                                     ''),
+                                                                     True),
                                            text=path_item[1])
                       for path_item in build_tuples(path_list)]
             return "\n".join(result)

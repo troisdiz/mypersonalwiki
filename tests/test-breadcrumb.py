@@ -1,19 +1,18 @@
 import unittest
 from gitwiki.breadcrumbrenderer import BreadcrumbRender
+from gitwiki.breadcrumbrenderer import build_tuples
 
 
 class TestGitWikiBreadcrumbs(unittest.TestCase):
 
     def test_build_tuples_empty(self):
-        bcr = BreadcrumbRender('/pages/')
-        real = [it for it in bcr.build_tuples([])]
+        real = [it for it in build_tuples([])]
         expected = [([], 'Home')]
         self.print_and_assert(real, expected)
 
     def test_build_tuples_1(self):
-        bcr = BreadcrumbRender('/pages/')
         item_name = 'Item1'
-        real = [it for it in bcr.build_tuples([item_name])]
+        real = [it for it in build_tuples([item_name])]
         expected = [([], 'Home'), ([item_name], item_name)]
         self.print_and_assert(real, expected)
 
