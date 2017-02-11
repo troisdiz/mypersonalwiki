@@ -28,6 +28,13 @@ class PathInfo:
         else:
             self.url_items = url_items
 
+    def __str__(self):
+        if self.path_on_disk is not None:
+            path_on_disk = self.path_on_disk
+        else:
+            path_on_disk = 'N/A'
+        return '%s [%s]' % (self.pathNature, path_on_disk)
+
 
 class MalFormedGitWikiUrl(Exception):
 
