@@ -10,18 +10,18 @@ class WikiView(View):
         self.breadcrumb_renderer = breadcrumb_renderer
 
     def dispatch_request(self, path):
-        print('Path %s' % path)
 
         path_info = self.path_manager.get_path_info_from_url(path)
 
         print('Path (url)  = ' + path)
-        print('PathNature  = ' + str(path_info.pathNature))
-        print('path (disk) = ' + path_info.path_on_disk)
+        print('PathInfo  = ' + str(path_info))
 
         if path_info.pathNature == PathNature.not_found:
             # TODO customize page (give path ?)
+            print('PathNature not found -> 404')
             abort(404)
         elif path_info.pathNature == PathNature.other_resource_not_found:
+            print('PathNature other resource not found -> 404')
             abort(404)
         elif path_info.pathNature == PathNature.other_resource_file:
             # TODO mime type
@@ -29,7 +29,7 @@ class WikiView(View):
         elif (path_info.pathNature == PathNature.folder_with_index) | (path_info.pathNature == PathNature.md_file):
             return self.return_wiki_page(path_info.path_on_disk, path_info.url_items)
         elif path_info.pathNature == PathNature.folder_without_index:
-            print('TODO 2')
+            print('PathNature folder without index : TODO 3')
 
     def return_wiki_page(self, page_path_on_disk, path_elements):
 
@@ -39,6 +39,6 @@ class WikiView(View):
         sidebar_content = "Sidebar Content"
         return render_template('index.html',
                                content=html_content,
-                               sidebar="Sidebar Content",
-                               table_of_content="Table of content",
+                               sidebar=sidebar_content,
+                               table_of_content=toc_content,
                                breadcrumb=breadcrumb_content)
