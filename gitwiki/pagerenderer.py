@@ -14,6 +14,7 @@ class PageRenderer:
         input_file = codecs.open(path_on_disk, mode="r", encoding="utf-8")
         text = input_file.read()
         html_content = markdown.markdown(text, extensions=['markdown.extensions.codehilite',
+                                                           'markdown.extensions.fenced_code',
                                                            'markdown.extensions.toc',
                                                            GitWikiLinkExtension(base_url='/pages/',
                                                                                 end_url='')])
