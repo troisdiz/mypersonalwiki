@@ -2,8 +2,8 @@
   "name": "static",
   "private": true,
   "dependencies": {
-    "bootstrap-sass": "~3.3.5",
-    "modernizr": "~2.8.3"
+    "bootstrap-sass": "~3.3.7",
+    "modernizr": "~3.3.1"
   },
   "overrides": {
     "bootstrap-sass": {
@@ -15,7 +15,7 @@
     }
   },
   "devDependencies": {
-    "chai": "~3.4.2",
-    "mocha": "~2.3.4"
+    "chai": "~3.5.0",
+    "mocha": "~3.2.0"
   }
 }
