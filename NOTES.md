@@ -6,27 +6,40 @@
     ./venv/bin/activate
     pip install -r requirements.txt
 
+1. Generate Pygments CSS
+
+```bash
+# Needs virtualenv to be activated
+# To be ran project root
+pygmentize -S default -f html > static/app/styles/style.css
+```
+
 1. Setup Web
-    
-    cd static
-    npm install
-    npm install -g bower
-    bower install
-    npm install -g grunt
-    grunt build
+
+```bash
+cd static
+npm install
+npm install -g bower
+bower install
+npm install -g grunt
+grunt build
+```
 
 1. Finish python setup
 
-    (from static)
-    rm -rf ../gitwiki/templates/* && cp -r dist/* ../gitwiki/templates/. 
-   
+```bash
+# from static
+rm -rf ../gitwiki/templates/* && cp -r dist/* ../gitwiki/templates/.
+```
+
 1. run server
-    
-    (From gitwiki)
-    export PYTHONPATH=$PYTHONPATH:`pwd`
-    python gitwiki/server.py [Pages root path]
-    
-   
+
+```bash
+# From project root
+export PYTHONPATH=$PYTHONPATH:`pwd`
+python gitwiki/server.py [Pages root path]
+```
+
 # Python #
 
 * add (almost) all markdown plugins
@@ -39,7 +52,7 @@
 
 # Other #
 
-* Git 
+* Git
 
 # Links #
 
@@ -63,6 +76,7 @@
 * [[https://pythonhosted.org/Flask-Markdown/]]
 * [[https://pythonhosted.org/Markdown/extensions/api.html]]
 * [[https://pythonhosted.org/Markdown/extensions/smarty.html]]
+* [[https://github.com/waylan/Python-Markdown/wiki/Third-Party-Extensions]]
 
 ## Web ##
 
