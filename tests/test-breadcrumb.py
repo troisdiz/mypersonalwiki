@@ -23,5 +23,5 @@ class TestGitWikiBreadcrumbs(unittest.TestCase):
 
     def test_render(self):
         bcr = BreadcrumbRender('/pages/')
-        self.assertEqual('<li>    <a href="/pages/index">Home</a></li>',
+        self.assertEqual('<li>    <a href="/pages/">Home</a></li>',
                          bcr.render_path([]))
