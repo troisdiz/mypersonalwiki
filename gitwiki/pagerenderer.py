@@ -1,21 +1,22 @@
 import codecs
-from markdown.extensions.wikilinks import WikiLinkExtension
 import markdown
-from gitwiki.urlbuilder import url_builder
 from gitwiki.extensions.gitwikilinks import GitWikiLinkExtension
+from gitwiki.extensions.gitwikitoc import TocExtension
 
 
 class PageRenderer:
 
     def __init__(self, base_pages_path):
         self.base_pages_path = base_pages_path
+        self.toc_ext = TocExtension()
 
     def render_page(self, path_on_disk):
         input_file = codecs.open(path_on_disk, mode="r", encoding="utf-8")
         text = input_file.read()
         html_content = markdown.markdown(text, extensions=['markdown.extensions.codehilite',
                                                            'markdown.extensions.fenced_code',
-                                                           'markdown.extensions.toc',
+                                                           self.toc_ext,
                                                            GitWikiLinkExtension(base_url='/pages/',
                                                                                 end_url='')])
-        return html_content
+        toc_content = self.toc_ext.toc
+        return toc_content, html_content

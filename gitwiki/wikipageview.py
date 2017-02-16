@@ -33,9 +33,8 @@ class WikiView(View):
 
     def return_wiki_page(self, page_path_on_disk, path_elements):
 
-        html_content = self.page_renderer.render_page(page_path_on_disk)
+        toc_content, html_content = self.page_renderer.render_page(page_path_on_disk)
         breadcrumb_content = self.breadcrumb_renderer.render_path(path_elements)
-        toc_content = "Table of Content"
         sidebar_content = "Sidebar Content"
         return render_template('index.html',
                                content=html_content,
