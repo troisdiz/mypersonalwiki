@@ -1,1 +1,9 @@
-Table of content
+<!--<div class="toc">-->
+<ul>
+<li><a href="#this-is-an-h1">This is an H1</a><ul>
+<li><a href="#second-title">Second Title</a></li>
+<li><a href="#une-image">Une image</a></li>
+</ul>
+</li>
+</ul>
+<!-- </div> -->
