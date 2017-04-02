@@ -8,7 +8,7 @@ BREADCRUMB_ITEM = """<li{%if class_attr is defined %}class="{{class_attr}}"{% en
 </li>"""
 
 
-class BreadcrumbRender:
+class BreadcrumbRenderer:
     def __init__(self, base_url):
         self.base_url = base_url
         self.template = Template(BREADCRUMB_ITEM, trim_blocks=True, lstrip_blocks=False)

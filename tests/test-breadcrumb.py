@@ -1,5 +1,5 @@
 import unittest
-from gitwiki.breadcrumbrenderer import BreadcrumbRender
+from gitwiki.breadcrumbrenderer import BreadcrumbRenderer
 from gitwiki.breadcrumbrenderer import build_tuples
 
 
@@ -22,6 +22,6 @@ class TestGitWikiBreadcrumbs(unittest.TestCase):
         self.assertListEqual(real, expected)
 
     def test_render(self):
-        bcr = BreadcrumbRender('/pages/')
+        bcr = BreadcrumbRenderer('/pages/')
         self.assertEqual('<li>    <a href="/pages/">Home</a></li>',
                          bcr.render_path([]))

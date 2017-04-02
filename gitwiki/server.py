@@ -3,7 +3,7 @@ import sys
 import os
 from gitwiki.pathmanager import PathManager
 from gitwiki.pagerenderer import PageRenderer
-from gitwiki.breadcrumbrenderer import BreadcrumbRender
+from gitwiki.breadcrumbrenderer import BreadcrumbRenderer
 from gitwiki.wikipageview import WikiView
 from gitwiki.staticpageview import StaticView
 
@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     path_manager = PathManager(base_pages_path)
     page_renderer = PageRenderer(base_pages_path)
-    breadcrumb_renderer = BreadcrumbRender('/pages/')
+    breadcrumb_renderer = BreadcrumbRenderer('/pages/')
     print("Base page path = %s" % base_pages_path)
 
     app = Flask('Personal Wiki')
