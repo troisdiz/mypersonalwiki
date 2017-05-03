@@ -11,4 +11,4 @@ npm install -g grunt
 grunt build
 cd ..
 
-rm -rf gitwiki/templates/* && cp -r static/dist/* gitwiki/templates/.
+rm -rf src/gitwiki/templates/* && cp -r static/dist/* src/gitwiki/templates/.
