@@ -22,3 +22,4 @@ class TestGitWikiPathUrls(unittest.TestCase):
                                                            toc_ext])
 
         self.assertIsNotNone(toc_ext.toc)
+        print(toc_ext.toc)
