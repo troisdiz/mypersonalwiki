@@ -7,13 +7,15 @@ from gitwiki.breadcrumbrenderer import BreadcrumbRenderer
 from gitwiki.wikipageview import WikiView
 from gitwiki.staticpageview import StaticView
 
+BASE_PAGE_URL = '/pages/'
+
 if __name__ == "__main__":
     base_pages_path = sys.argv[1]
     program_base_path = os.path.dirname(os.path.realpath(__file__))
 
     path_manager = PathManager(base_pages_path)
-    page_renderer = PageRenderer(base_pages_path)
-    breadcrumb_renderer = BreadcrumbRenderer('/pages/')
+    page_renderer = PageRenderer(base_url=BASE_PAGE_URL, base_pages_path=base_pages_path)
+    breadcrumb_renderer = BreadcrumbRenderer(BASE_PAGE_URL)
     print("Base page path = %s" % base_pages_path)
 
     app = Flask('Personal Wiki')
@@ -23,8 +25,8 @@ if __name__ == "__main__":
                                       breadcrumb_renderer=breadcrumb_renderer)
     static_page_view = StaticView.as_view(name='static_page_view',
                                           path_manager=path_manager)
-    app.add_url_rule(rule='/pages/', view_func=wiki_page_view, defaults={'path': ''})
-    app.add_url_rule(rule='/pages/<path:path>', view_func=wiki_page_view)
+    app.add_url_rule(rule=BASE_PAGE_URL, view_func=wiki_page_view, defaults={'path': ''})
+    app.add_url_rule(rule=BASE_PAGE_URL + '<path:path>', view_func=wiki_page_view)
     app.add_url_rule(rule='/static2/<path:path>', view_func=static_page_view)
 
     app.run(host='0.0.0.0', port=8080, debug=True)

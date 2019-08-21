@@ -6,7 +6,8 @@ from gitwiki.extensions.gitwikitoc import TocExtension
 
 class PageRenderer:
 
-    def __init__(self, base_pages_path):
+    def __init__(self, base_url, base_pages_path):
+        self.base_url = base_url
         self.base_pages_path = base_pages_path
         self.toc_ext = TocExtension()
 
@@ -16,7 +17,7 @@ class PageRenderer:
         html_content = markdown.markdown(text, extensions=['markdown.extensions.codehilite',
                                                            'markdown.extensions.fenced_code',
                                                            self.toc_ext,
-                                                           GitWikiLinkExtension(base_url='/pages/',
+                                                           GitWikiLinkExtension(base_url=self.base_url,
                                                                                 end_url='')])
         toc_content = self.toc_ext.toc
         return toc_content, html_content
