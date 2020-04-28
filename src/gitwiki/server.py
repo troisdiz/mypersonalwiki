@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, redirect, url_for
 import sys
 import os
 from gitwiki.pathmanager import PathManager
@@ -29,5 +29,10 @@ if __name__ == "__main__":
     app.add_url_rule(rule=BASE_PAGE_URL + '<path:path>', view_func=wiki_page_view)
     app.add_url_rule(rule='/static2/<path:path>', view_func=static_page_view)
 
-    app.run(host='0.0.0.0', port=8080, debug=True)
-    app.make_response("toto")
+
+    @app.route('/')
+    def index():
+        return redirect(BASE_PAGE_URL)
+
+    app.run(host='127.0.0.1', port=8080, debug=True)
+    # app.make_response("toto")
