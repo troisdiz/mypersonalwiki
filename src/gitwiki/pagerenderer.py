@@ -1,7 +1,7 @@
 import codecs
 import markdown
 from gitwiki.extensions.gitwikilinks import GitWikiLinkExtension
-from gitwiki.extensions.gitwikitoc import TocExtension
+from gitwiki.extensions.gitwikitoc import GitWikiTocExtension
 
 
 class PageRenderer:
@@ -9,7 +9,7 @@ class PageRenderer:
     def __init__(self, base_url, base_pages_path):
         self.base_url = base_url
         self.base_pages_path = base_pages_path
-        self.toc_ext = TocExtension()
+        self.toc_ext = GitWikiTocExtension()
 
     def render_page(self, path_on_disk):
         input_file = codecs.open(path_on_disk, mode="r", encoding="utf-8")
