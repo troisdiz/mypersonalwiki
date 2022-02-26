@@ -1,5 +1,6 @@
 import codecs
 import markdown
+from markdown.extensions.codehilite import CodeHiliteExtension
 from gitwiki.extensions.gitwikilinks import GitWikiLinkExtension
 from gitwiki.extensions.gitwikitoc import GitWikiTocExtension
 
@@ -14,7 +15,7 @@ class PageRenderer:
     def render_page(self, path_on_disk):
         input_file = codecs.open(path_on_disk, mode="r", encoding="utf-8")
         text = input_file.read()
-        html_content = markdown.markdown(text, extensions=['markdown.extensions.codehilite',
+        html_content = markdown.markdown(text, extensions=[CodeHiliteExtension(cssclass='codehilite card'),
                                                            'markdown.extensions.fenced_code',
                                                            self.toc_ext,
                                                            GitWikiLinkExtension(base_url=self.base_url,

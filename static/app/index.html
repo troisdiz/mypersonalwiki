@@ -1,0 +1,86 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Page Title</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+  <link rel="stylesheet" href="../static2/styles/bootstrap.min.css">
+  <link rel="stylesheet" href="../static2/styles/main.css">
+  <link rel="stylesheet" href="../static2/styles/pygments.css">
+
+
+</head>
+<body>
+
+<div class="container-fluid">
+
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header navbar-primary" >
+        <a class="navbar-brand" href="#">
+          <!-- <img alt="Brand" src="...">-->
+        </a>
+        <a class="navbar-brand" href="#">Brand</a>
+      </div>
+    </div>
+
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ol class="breadcrumb">
+        {{ breadcrumb|safe }}
+      </ol>
+    </div>
+  </nav>
+
+  <div class="row">
+    <div class="col-md-2">
+      <div class="card">
+        <h5 class="card-header bg-primary text-light border-primary rounded-top">
+          Sidebar
+        </h5>
+        <div class="card-body bg-light text-dark">
+         {{ sidebar|safe }}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body bg-light text-dark">
+         {{ content|safe }}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card">
+        <h5 class="card-header bg-primary text-light border-primary">
+         Table of content
+        </h5>
+        <div class="card-body">
+          {{ table_of_content|safe }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!--
+  <div class="header">
+    <ul class="nav nav-pills pull-right">
+      <li class="active"><a href="#">Home</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+    <h3 class="text-muted">Personal Wiki</h3>
+  </div>
+  -->
+</div>
+
+
+
+</body>
+</html>
