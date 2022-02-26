@@ -11,25 +11,16 @@
 ```bash
 # Needs virtualenv to be activated
 # To be ran project root
-pygmentize -S default -f html > static/app/styles/style.css
+pygmentize -S default -f html > static/app/styles/pygments.css
 ```
 
 1. Setup Web
 
-```bash
-cd static
-npm install
-npm install -g bower
-bower install
-npm install -g grunt
-grunt build
-```
-
 1. Finish python setup
 
 ```bash
-# from static
-rm -rf ../gitwiki/templates/* && cp -r dist/* ../gitwiki/templates/.
+# From root
+cp -r static/app/* src/gitwiki/templates/.
 ```
 
 1. run server
