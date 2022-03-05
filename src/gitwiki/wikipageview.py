@@ -1,7 +1,6 @@
 from flask.views import View
 from flask import render_template, abort, send_file
-
-from gitwiki.pathmanager import PathNature, PathManager
+from gitwiki.pathmanager import PathInfo, PathNature, PathManager
 
 
 class WikiView(View):
@@ -14,7 +13,7 @@ class WikiView(View):
 
     def dispatch_request(self, path):
 
-        path_info = self.path_manager.get_path_info_from_url(path)
+        path_info: PathInfo = self.path_manager.get_path_info_from_url(path)
 
         print('Path (url)  = ' + path)
         print('PathInfo  = ' + str(path_info))
@@ -33,6 +32,9 @@ class WikiView(View):
             return self.return_wiki_page(path_info.path_on_disk, path_info.url_items)
         elif path_info.pathNature == PathNature.folder_without_index:
             print('PathNature folder without index : TODO 3')
+        else:
+            print('PathNature default case -> 500')
+            abort(500)
 
     def return_wiki_page(self, page_path_on_disk, path_elements):
 
