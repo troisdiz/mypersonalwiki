@@ -19,16 +19,16 @@ class PathNature(Enum):
 
 
 class PathInfo:
-    def __init__(self, path_nature, path_on_disk, url_items=None):
-        self.pathNature = path_nature
-        self.path_on_disk = path_on_disk
+    def __init__(self, path_nature: PathNature, path_on_disk: str, url_items=None):
+        self.pathNature: PathNature = path_nature
+        self.path_on_disk: str = path_on_disk
         # TODO
         if url_items is None:
             self.url_items = []
         else:
             self.url_items = url_items
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.path_on_disk is not None:
             path_on_disk = self.path_on_disk
         else:
@@ -48,7 +48,7 @@ class GitWikiUrl:
         self.is_absolute = is_absolute
         self.path_elements = path_elements
 
-    def canonize(self):
+    def canonize(self) -> 'GitWikiUrl':
         path_elements = self.path_elements
         while True:
             try:
@@ -69,14 +69,14 @@ class PathManager:
         self.base_path = base_path
 
     # TODO implement
-    def contains_index(self, path):
+    def contains_index(self, path: str) -> bool:
         return self.exists_on_disk(join(path, INDEX_FILE_NAME))
 
-    def exists_on_disk(self, path):
+    def exists_on_disk(self, path: str) -> bool:
         # TODO already includes base_path ?
         return exists(join(self.base_path, path))
 
-    def get_path_info_from_url(self, raw_url_path):
+    def get_path_info_from_url(self, raw_url_path: str) -> PathInfo:
         # TODO portability because of separator
         # TODO handle .md files extensions
         # TODO handle folders which should default to index.md
