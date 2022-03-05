@@ -33,10 +33,16 @@ class WikiView(View):
 
     def return_wiki_page(self, page_path_on_disk, path_elements):
 
+        print(f"Wiki page view : path_elements={path_elements}")
+
         toc_content, html_content = self.page_renderer.render_page(page_path_on_disk)
         breadcrumb_content = self.breadcrumb_renderer.render_path(path_elements)
+        relative_to_root = ".."
+        for i in range(len(path_elements)):
+            relative_to_root = relative_to_root + "/.."
         sidebar_content = "Sidebar Content"
         return render_template('index.html',
+                               relative_to_root=relative_to_root,
                                content=html_content,
                                sidebar=sidebar_content,
                                table_of_content=toc_content,

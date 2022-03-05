@@ -27,7 +27,7 @@ if __name__ == "__main__":
                                           path_manager=path_manager)
     app.add_url_rule(rule=BASE_PAGE_URL, view_func=wiki_page_view, defaults={'path': ''})
     app.add_url_rule(rule=BASE_PAGE_URL + '<path:path>', view_func=wiki_page_view)
-    app.add_url_rule(rule='/static2/<path:path>', view_func=static_page_view)
+    app.add_url_rule(rule='/_mpw_static/<path:path>', view_func=static_page_view)
 
 
     @app.route('/')

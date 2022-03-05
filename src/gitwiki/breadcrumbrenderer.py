@@ -1,7 +1,7 @@
 from jinja2 import Template
 from gitwiki.extensions.gitwikilinks import build_url_from_paths
 
-BREADCRUMB_ITEM = """<li{%if class_attr is defined %}class="{{class_attr}}"{% endif %}>{% if link is defined %}
+BREADCRUMB_ITEM = """<li{%if class_attr is defined %} class="{{class_attr}}"{% endif %}>{% if link is defined %}
     <a href="{{link}}">{{text}}</a>{% else %}
     {{text}}
     {% endif %}
@@ -19,7 +19,8 @@ class BreadcrumbRenderer:
             result = [self.template.render(link=build_url_from_paths(path_item[0],
                                                                      self.base_url,
                                                                      True),
-                                           text=path_item[1])
+                                           text=path_item[1],
+                                           class_attr="breadcrumb-item")
                       for path_item in build_tuples(path_list)]
             return "\n".join(result)
         else:
