@@ -37,6 +37,7 @@ class WikiView(View):
         breadcrumb_content = self.breadcrumb_renderer.render_path(path_elements)
         sidebar_content = "Sidebar Content"
         return render_template('index.html',
+                               relative_to_root="..",
                                content=html_content,
                                sidebar=sidebar_content,
                                table_of_content=toc_content,
