@@ -1,4 +1,4 @@
-Flask==1.1.4
+Flask==2.3.2
 Jinja2==2.11.3
 # To workaround a bug introduced in 2.1.0
 markupsafe==2.0.1
