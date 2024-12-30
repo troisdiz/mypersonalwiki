@@ -1,6 +1,6 @@
 from flask.views import View
 from flask import render_template, abort, send_file
-from gitwiki.pathmanager import PathNature
+from gitwiki.pathmanager import PathNature, PathInfo
 
 
 class WikiView(View):
@@ -11,7 +11,7 @@ class WikiView(View):
 
     def dispatch_request(self, path):
 
-        path_info = self.path_manager.get_path_info_from_url(path)
+        path_info: PathInfo = self.path_manager.get_path_info_from_url(path)
 
         print('Path (url)  = ' + path)
         print('PathInfo  = ' + str(path_info))
