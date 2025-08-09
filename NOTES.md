@@ -12,6 +12,9 @@
 # Needs virtualenv to be activated
 # To be ran project root
 pygmentize -S default -f html > static/app/styles/pygments.css
+# .syntax of the CSS selector of the parent element
+# To be used in the python code
+pygmentize -S default -f html -a .syntax> static/app/styles/pygments.css
 ```
 
 1. Setup Web

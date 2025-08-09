@@ -1,6 +1,6 @@
-Flask==3.1.0
-Jinja2==3.1.5
+Flask==3.1.1
+Jinja2==3.1.6
 # To workaround a bug introduced in 2.1.0
 # markupsafe==2.0.1
 Markdown==3.3.7
-Pygments==2.18
+Pygments==2.19.2
