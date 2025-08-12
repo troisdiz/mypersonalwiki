@@ -1,4 +1,5 @@
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect
+from jinja2 import PackageLoader
 import sys
 import os
 from gitwiki.pathmanager import PathManager
@@ -13,7 +14,7 @@ if __name__ == "__main__":
     base_pages_path = sys.argv[1]
     program_base_path = os.path.dirname(os.path.realpath(__file__))
 
-    path_manager = PathManager(base_pages_path)
+    path_manager = PathManager(program_base_path, base_pages_path)
     page_renderer = PageRenderer(base_url=BASE_PAGE_URL, base_pages_path=base_pages_path)
     breadcrumb_renderer = BreadcrumbRenderer(BASE_PAGE_URL)
     print("Base page path = %s" % base_pages_path)

@@ -4,6 +4,8 @@ from urllib import parse
 from enum import Enum
 from enum import unique
 
+from jinja2 import Environment, PackageLoader
+
 INDEX_FILE_NAME = 'index.md'
 URL_CHARACTER_SEPARATOR = '/'
 
@@ -65,8 +67,29 @@ class GitWikiUrl:
 
 
 class PathManager:
-    def __init__(self, base_path):
+    """
+    PathManager is responsible for managing paths in gitwiki
+
+    """
+    def __init__(self, templates_base_path, base_path):
+        """
+        Creates a PathManager instance
+
+        :templates_base_path is the parent of the gitwiki templates repository where the templates folder is located
+        :base_path is the root of the wiki repository, where the pages and other assets are stored
+        """
+        self.templates_path = join(templates_base_path, 'templates')
+        loader = PackageLoader("gitwiki", "templates")
+        self.jinja_env = Environment(
+            loader=loader,
+        )
         self.base_path = base_path
+
+    def get_templates_path(self):
+        return self.templates_path
+
+    def get_jinja_template(self, template_name):
+        return self.jinja_env.get_template(template_name)
 
     # TODO implement
     def contains_index(self, path):
