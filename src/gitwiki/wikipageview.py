@@ -32,6 +32,7 @@ class WikiView(View):
             return self.return_wiki_page(path_info.path_on_disk, path_info.url_items)
         elif path_info.pathNature == PathNature.folder_without_index:
             print('PathNature folder without index : TODO 3')
+            abort(500)
         else:
             print('PathNature default case -> 500')
             abort(500)
