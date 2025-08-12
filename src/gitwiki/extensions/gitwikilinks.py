@@ -1,6 +1,18 @@
-from markdown import Extension
+# This is a fork of the WikiLinks extension from Python-Markdown
+# with modifications to support GitWiki specific features.
+
+# Original code Copyright [Waylan Limberg](http://achinghead.com/).
+# All changes Copyright The Python Markdown Project
+# License: [BSD](https://opensource.org/licenses/bsd-license.php)
+
+"""
+Converts `[[WikiLinks]]` to relative links.
+
+"""
+
+from markdown.extensions import Extension
 from markdown.inlinepatterns import Pattern
-from markdown.util import etree
+import xml.etree.ElementTree as eTree
 import re
 
 replacements = "".maketrans("àâéèêîôùû", "aaeeeiouu")
@@ -11,8 +23,6 @@ def build_url(label, base, end):
     no_accent = normalize(label)
     clean_label = re.sub(r'([ ]+_)|(_[ ]+)|([ ]+)', '_', no_accent)
     final_label = clean_label
-    # if clean_label.endswith('/'):
-    #     final_label = clean_label + "index"
 
     if final_label.startswith('/'):
         # Absolute url
@@ -23,8 +33,6 @@ def build_url(label, base, end):
 
 
 def build_url_from_paths(paths, base, is_folder):
-    # paths_with_slash = [path + '/' for path in paths]
-    # url = build_url('/' + '/'.join(paths_with_slash), base, end)
     url = build_url('/' + '/'.join(paths), base, '')
     if is_folder:
         if url[-1] != '/':
@@ -32,9 +40,14 @@ def build_url_from_paths(paths, base, is_folder):
     return url
 
 
+WIKILINK_RE: str = r'\[\[([\w0-9_ -\.\/]+)\]\]'
+# Original priority from Python-Markdown's wikilinks extension
+WIKILINK_PATTERN_PRIORITY: float = 75
+
 class GitWikiLinkExtension(Extension):
 
     def __init__(self, *args, **kwargs):
+        self.md = None
         self.config = {
             'base_url': ['/', 'String to append to beginning or URL.'],
             'end_url': ['/', 'String to append to end of URL.'],
@@ -42,16 +55,15 @@ class GitWikiLinkExtension(Extension):
             'build_url': [build_url, 'Callable formats URL from label.'],
         }
 
-        super(GitWikiLinkExtension, self).__init__(*args, **kwargs)
+        super(GitWikiLinkExtension, self).__init__(**kwargs)
 
-    def extendMarkdown(self, md, md_globals):
+    def extendMarkdown(self, md):
         self.md = md
 
         # append to end of inline patterns
-        WIKILINK_RE = r'\[\[([\w0-9_ -\.\/]+)\]\]'
-        wikilinkPattern = GitWikiLinks(WIKILINK_RE, self.getConfigs())
-        wikilinkPattern.md = md
-        md.inlinePatterns.add('wikilink', wikilinkPattern, "<not_strong")
+        wikilink_pattern = GitWikiLinks(WIKILINK_RE, self.getConfigs())
+        wikilink_pattern.md = self.md
+        self.md.inlinePatterns.register(wikilink_pattern, 'wikilink', WIKILINK_PATTERN_PRIORITY)
 
 
 def build_text_link(label):
@@ -74,7 +86,7 @@ class GitWikiLinks(Pattern):
             base_url, end_url, html_class = self._getMeta()
             label = m.group(2).strip()
             url = build_url(label, base_url, end_url)
-            a = etree.Element('a')
+            a = eTree.Element('a')
             a.text = build_text_link(label)
             a.set('href', url)
             if html_class:
