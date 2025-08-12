@@ -1,3 +1,4 @@
+import flask
 from flask import Flask, redirect
 from jinja2 import PackageLoader
 import sys
@@ -10,8 +11,8 @@ from gitwiki.staticpageview import StaticView
 
 BASE_PAGE_URL = '/pages/'
 
-if __name__ == "__main__":
-    base_pages_path = sys.argv[1]
+
+def create_flask_app(base_pages_path: str) -> flask.Flask:
     program_base_path = os.path.dirname(os.path.realpath(__file__))
 
     path_manager = PathManager(program_base_path, base_pages_path)
@@ -30,10 +31,16 @@ if __name__ == "__main__":
     app.add_url_rule(rule=BASE_PAGE_URL + '<path:path>', view_func=wiki_page_view)
     app.add_url_rule(rule='/_mpw_static/<path:path>', view_func=static_page_view)
 
-
     @app.route('/')
     def index():
         return redirect(BASE_PAGE_URL)
+
+    return app
+
+
+if __name__ == "__main__":
+    base_pages_path = sys.argv[1]
+    app = create_flask_app(base_pages_path)
 
     # Try to use a port for debug with minimal collisions
     app.run(host='127.0.0.1', port=8085, debug=True)
