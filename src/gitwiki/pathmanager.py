@@ -159,16 +159,6 @@ class PathManager:
                                 path_on_disk=None,
                                 url_items=file_parent_url_items)
 
-    # def get_static_path_from_url(self, raw_url_path):
-    #     # TODO portability because of separator
-    #     # TODO handle .md files extensions
-    #     # TODO handle folders which should default to index.md
-    #     # TODO Create object to handle this stuff and make it testable
-    #
-    #     decoded_url_path = parse.unquote(raw_url_path)
-    #     path_elts = decoded_url_path.split(URL_CHARACTER_SEPARATOR)
-    #     return join(self.base_path, decoded_url_path)
-
 
 def find_extension(url):
     reversed_url = url.reverse
