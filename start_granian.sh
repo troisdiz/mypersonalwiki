@@ -4,7 +4,7 @@ unameOut="$(uname -s)"
 case "${unameOut}" in
     Linux*)     GNU_PREFIX="";;
     Darwin*)    GNU_PREFIX="g";;
-    *)          GNU_PREFIX=""
+    *)          GNU_PREFIX="";;
 esac
 
 readonly PROGNAME=$(${GNU_PREFIX}basename $0)

@@ -75,8 +75,8 @@ class PathManager:
         """
         Creates a PathManager instance
 
-        :templates_base_path is the parent of the gitwiki templates repository where the templates folder is located
-        :base_path is the root of the wiki repository, where the pages and other assets are stored
+        :param templates_base_path: The parent of the gitwiki templates repository where the templates folder is located
+        :param base_path: The root of the wiki repository, where the pages and other assets are stored
         """
         self.templates_path = join(templates_base_path, 'templates')
         loader = PackageLoader("gitwiki", "templates")
