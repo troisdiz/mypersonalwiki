@@ -1,13 +1,16 @@
 from flask.views import View
 from flask import render_template, abort, send_file
-from gitwiki.pathmanager import PathNature
+
+from gitwiki.pathmanager import PathNature, PathManager
 
 
 class WikiView(View):
-    def __init__(self, path_manager, page_renderer, breadcrumb_renderer):
+    def __init__(self, path_manager: PathManager, page_renderer, breadcrumb_renderer):
         self.path_manager = path_manager
         self.page_renderer = page_renderer
         self.breadcrumb_renderer = breadcrumb_renderer
+
+        self.index_template = path_manager.get_jinja_template('index.html')
 
     def dispatch_request(self, path):
 
@@ -41,7 +44,7 @@ class WikiView(View):
         for i in range(len(path_elements)):
             relative_to_root = relative_to_root + "/.."
         sidebar_content = "Sidebar Content"
-        return render_template('index.html',
+        return render_template(self.index_template,
                                relative_to_root=relative_to_root,
                                content=html_content,
                                sidebar=sidebar_content,
