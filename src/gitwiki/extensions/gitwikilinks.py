@@ -1,6 +1,18 @@
+# This is a fork of the WikiLinks extension from Python-Markdown
+# with modifications to support GitWiki specific features.
+
+# Original code Copyright [Waylan Limberg](http://achinghead.com/).
+# All changes Copyright The Python Markdown Project
+# License: [BSD](https://opensource.org/licenses/bsd-license.php)
+
+"""
+Converts `[[WikiLinks]]` to relative links.
+
+"""
+
 from markdown.extensions import Extension
 from markdown.inlinepatterns import Pattern
-import xml.etree.ElementTree as etree
+import xml.etree.ElementTree as eTree
 import re
 
 replacements = "".maketrans("àâéèêîôùû", "aaeeeiouu")
@@ -28,9 +40,13 @@ def build_url_from_paths(paths, base, is_folder):
     return url
 
 
+WIKILINK_RE: str = r'\[\[([\w0-9_ -\.\/]+)\]\]'
+
+
 class GitWikiLinkExtension(Extension):
 
     def __init__(self, *args, **kwargs):
+        self.md = None
         self.config = {
             'base_url': ['/', 'String to append to beginning or URL.'],
             'end_url': ['/', 'String to append to end of URL.'],
@@ -44,10 +60,9 @@ class GitWikiLinkExtension(Extension):
         self.md = md
 
         # append to end of inline patterns
-        WIKILINK_RE = r'\[\[([\w0-9_ -\.\/]+)\]\]'
-        wikilinkPattern = GitWikiLinks(WIKILINK_RE, self.getConfigs())
-        wikilinkPattern.md = md
-        md.inlinePatterns.register(wikilinkPattern, 'wikilink', 75)
+        wikilink_pattern = GitWikiLinks(WIKILINK_RE, self.getConfigs())
+        wikilink_pattern.md = self.md
+        self.md.inlinePatterns.register(wikilink_pattern, 'wikilink', 75)
 
 
 def build_text_link(label):
@@ -70,7 +85,7 @@ class GitWikiLinks(Pattern):
             base_url, end_url, html_class = self._getMeta()
             label = m.group(2).strip()
             url = build_url(label, base_url, end_url)
-            a = etree.Element('a')
+            a = eTree.Element('a')
             a.text = build_text_link(label)
             a.set('href', url)
             if html_class:
