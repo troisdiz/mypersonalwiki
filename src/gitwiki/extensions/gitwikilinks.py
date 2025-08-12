@@ -41,7 +41,8 @@ def build_url_from_paths(paths, base, is_folder):
 
 
 WIKILINK_RE: str = r'\[\[([\w0-9_ -\.\/]+)\]\]'
-
+# Original priority from Python-Markdown's wikilinks extension
+WIKILINK_PATTERN_PRIORITY: float = 75
 
 class GitWikiLinkExtension(Extension):
 
@@ -62,7 +63,7 @@ class GitWikiLinkExtension(Extension):
         # append to end of inline patterns
         wikilink_pattern = GitWikiLinks(WIKILINK_RE, self.getConfigs())
         wikilink_pattern.md = self.md
-        self.md.inlinePatterns.register(wikilink_pattern, 'wikilink', 75)
+        self.md.inlinePatterns.register(wikilink_pattern, 'wikilink', WIKILINK_PATTERN_PRIORITY)
 
 
 def build_text_link(label):
