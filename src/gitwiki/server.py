@@ -34,5 +34,5 @@ if __name__ == "__main__":
     def index():
         return redirect(BASE_PAGE_URL)
 
-    app.run(host='127.0.0.1', port=8080, debug=True)
-    # app.make_response("toto")
+    # Try to use a port for debug with minimal collisions
+    app.run(host='127.0.0.1', port=8085, debug=True)
