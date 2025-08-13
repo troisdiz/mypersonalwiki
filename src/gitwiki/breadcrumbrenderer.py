@@ -34,5 +34,6 @@ def build_tuples(path_list: list[str]) -> Generator:
     yield current_path, 'Home', True
     for idx, path_item in enumerate(path_list):
         current_path = list(current_path + [path_item])
+        # The last item is always a file, so it is not a folder
         is_folder: bool = (idx != path_list_len-1)
         yield current_path, path_item, is_folder
