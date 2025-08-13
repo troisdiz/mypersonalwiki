@@ -21,21 +21,21 @@ class PathNature(Enum):
 
 
 class PathInfo:
-    def __init__(self, path_nature, path_on_disk, url_items=None):
-        self.pathNature = path_nature
-        self.path_on_disk = path_on_disk
+    def __init__(self, path_nature: PathNature, path_on_disk: str, url_items: list[str] = None):
+        self.pathNature: PathNature = path_nature
+        self.path_on_disk: str = path_on_disk
         # TODO
         if url_items is None:
             self.url_items = []
         else:
             self.url_items = url_items
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.path_on_disk is not None:
             path_on_disk = self.path_on_disk
         else:
             path_on_disk = 'N/A'
-        return '%s [%s]' % (self.pathNature, path_on_disk)
+        return f"{self.pathNature} [{path_on_disk}] / url items {self.url_items}"
 
 
 class MalFormedGitWikiUrl(Exception):
@@ -50,7 +50,7 @@ class GitWikiUrl:
         self.is_absolute = is_absolute
         self.path_elements = path_elements
 
-    def canonize(self):
+    def canonize(self) -> 'GitWikiUrl':
         path_elements = self.path_elements
         while True:
             try:
@@ -92,14 +92,14 @@ class PathManager:
         return self.jinja_env.get_template(template_name)
 
     # TODO implement
-    def contains_index(self, path):
-        return self.exists_on_disk(join(path, INDEX_FILE_NAME))
+    def _contains_index(self, path: str) -> bool:
+        return self._exists_on_disk(join(path, INDEX_FILE_NAME))
 
-    def exists_on_disk(self, path):
+    def _exists_on_disk(self, path: str) -> bool:
         # TODO already includes base_path ?
         return exists(join(self.base_path, path))
 
-    def get_path_info_from_url(self, raw_url_path):
+    def get_path_info_from_url(self, raw_url_path: str) -> PathInfo:
         # TODO portability because of separator
         # TODO handle .md files extensions
         # TODO handle folders which should default to index.md
@@ -121,8 +121,8 @@ class PathManager:
         if raw_path_elts[-1] == '':
             # Folder case
             path_nature = None
-            if self.exists_on_disk(unslashed_decoded_url_path):
-                if self.contains_index(unslashed_decoded_url_path):
+            if self._exists_on_disk(unslashed_decoded_url_path):
+                if self._contains_index(unslashed_decoded_url_path):
                     path_nature = PathNature.folder_with_index
                 else:
                     path_nature = PathNature.folder_without_index
@@ -141,16 +141,16 @@ class PathManager:
             # No extension
             path_nature = None
             potential_md_path = join(self.base_path, unslashed_decoded_url_path + '.md')
-            if self.exists_on_disk(potential_md_path):
+            if self._exists_on_disk(potential_md_path):
                 return PathInfo(path_nature=PathNature.md_file,
                                 path_on_disk=potential_md_path,
-                                url_items=file_parent_url_items)
+                                url_items=cleaned_path_elts)
             else:
                 return PathInfo(path_nature=PathNature.not_found,
                                 path_on_disk=None,
-                                url_items=file_parent_url_items)
+                                url_items=cleaned_path_elts)
         else:
-            if self.exists_on_disk(unslashed_decoded_url_path):
+            if self._exists_on_disk(unslashed_decoded_url_path):
                 return PathInfo(path_nature=PathNature.other_resource_file,
                                 path_on_disk=join(self.base_path, decoded_url_path),
                                 url_items=file_parent_url_items)
@@ -158,16 +158,6 @@ class PathManager:
                 return PathInfo(path_nature=PathNature.other_resource_not_found,
                                 path_on_disk=None,
                                 url_items=file_parent_url_items)
-
-    def get_static_path_from_url(self, raw_url_path):
-        # TODO portability because of separator
-        # TODO handle .md files extensions
-        # TODO handle folders which should default to index.md
-        # TODO Create object to handle this stuff and make it testable
-
-        decoded_url_path = parse.unquote(raw_url_path)
-        path_elts = decoded_url_path.split(URL_CHARACTER_SEPARATOR)
-        return join(self.base_path, decoded_url_path)
 
 
 def find_extension(url):

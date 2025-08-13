@@ -1,3 +1,4 @@
+from typing import Generator
 from jinja2 import Template
 from gitwiki.extensions.gitwikilinks import build_url_from_paths
 
@@ -18,7 +19,7 @@ class BreadcrumbRenderer:
 
             result = [self.template.render(link=build_url_from_paths(path_item[0],
                                                                      self.base_url,
-                                                                     True),
+                                                                     path_item[2]),
                                            text=path_item[1],
                                            class_attr="breadcrumb-item")
                       for path_item in build_tuples(path_list)]
@@ -27,9 +28,12 @@ class BreadcrumbRenderer:
             return ''
 
 
-def build_tuples(path_list):
+def build_tuples(path_list: list[str]) -> Generator:
     current_path = []
-    yield (current_path, 'Home')
-    for path_item in path_list:
+    path_list_len: int = len(path_list)
+    yield current_path, 'Home', True
+    for idx, path_item in enumerate(path_list):
         current_path = list(current_path + [path_item])
-        yield (current_path, path_item)
+        # The last item is always a file, so it is not a folder
+        is_folder: bool = (idx != path_list_len-1)
+        yield current_path, path_item, is_folder
