@@ -1,4 +1,4 @@
-<li><a href="/pages/index">Home</a></li>
-<li><a href="/pages/dokuwiki/index">dokuwiki</a></li>
-<li><a href="/pages/dokuwiki/journal/index">journal</a></li>
-<li><a href="/pages/dokuwiki/journal/index"></a></li>
+<li class="breadcrumb-item"><a href="/pages/index">Home</a></li>
+<li class="breadcrumb-item"><a href="/pages/dokuwiki/index">dokuwiki</a></li>
+<li class="breadcrumb-item"><a href="/pages/dokuwiki/journal/index">journal</a></li>
+<li class="breadcrumb-item"><a href="/pages/dokuwiki/journal/index"></a></li>

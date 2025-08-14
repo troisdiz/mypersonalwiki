@@ -19,7 +19,7 @@
 
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
-        {{ breadcrumb|safe }}
+          <%= breadcrumb %>
       </ol>
   </nav>
 
@@ -30,14 +30,14 @@
           Sidebar
         </h5>
         <div class="card-body bg-light text-dark">
-         {{ sidebar|safe }}
+         <%= sidebar %>
         </div>
       </div>
     </div>
     <div class="col-md-8">
       <div class="card">
         <div class="card-body bg-light text-dark">
-         {{ content|safe }}
+         <%= content %>
         </div>
       </div>
     </div>
@@ -47,7 +47,7 @@
          Table of content
         </h5>
         <div class="card-body">
-          {{ table_of_content|safe }}
+          <%= table_of_content %>
         </div>
       </div>
     </div>
