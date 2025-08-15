@@ -1,8 +1,8 @@
 const path = require('path');
 const fs = require('fs');
-const util = require('util')
+const util = require('util');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const miniCssExtractPlugin = require('mini-css-extract-plugin')
+const miniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const devTemplatesFolder = path.resolve(__dirname, "sample-templates");
 
@@ -50,11 +50,10 @@ function buildHtmlWebpackPlugin(mode) {
 }
 
 function buildPlugins(mode) {
-    plugins = [
+    return [
         buildHtmlWebpackPlugin(mode),
         new miniCssExtractPlugin(),
     ]
-    return plugins
 }
 
 
