@@ -34,7 +34,7 @@ function buildHtmlWebpackPlugin(mode) {
             templateParameters[name] = `{{ ${name}|safe }}`;
         } else if (mode === 'development') {
             templateParameters[name] = fs.readFileSync(
-                path.resolve(devTemplatesFolder, `${name}.txt`),
+                path.resolve(devTemplatesFolder, `${name}.html`),
                 'utf-8'
             )
         }

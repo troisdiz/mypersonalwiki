@@ -1,10 +1,15 @@
+from string import Template
+
 from flask.views import View
 from flask import render_template, abort, send_file
+
+from gitwiki.breadcrumbrenderer import BreadcrumbRenderer
+from gitwiki.pagerenderer import PageRenderer
 from gitwiki.pathmanager import PathInfo, PathNature, PathManager
 
 
 class WikiView(View):
-    def __init__(self, path_manager: PathManager, page_renderer, breadcrumb_renderer):
+    def __init__(self, path_manager: PathManager, page_renderer: PageRenderer, breadcrumb_renderer: BreadcrumbRenderer):
         self.path_manager = path_manager
         self.page_renderer = page_renderer
         self.breadcrumb_renderer = breadcrumb_renderer

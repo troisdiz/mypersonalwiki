@@ -4,9 +4,9 @@
 
 # Title 1 (Level 1)
 
-## title 1.1 (Level 2)
+## Title 1.1 (Level 2)
 
-## title 1.2 (Level 2)
+## Title 1.2 (Level 2)
 
 ### Title 1.1.1 (Level 3)
 
