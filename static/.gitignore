@@ -1,4 +1,10 @@
 node_modules
 dist
 .tmp
-bower_components
+.yarn
+.yarnrc.yml
+.pnp.cjs
+.pnp.loader.mjs
+
+
+src/pygments.css
