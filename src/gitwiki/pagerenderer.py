@@ -7,12 +7,12 @@ from gitwiki.extensions.gitwikitoc import GitWikiTocExtension
 
 class PageRenderer:
 
-    def __init__(self, base_url, base_pages_path):
+    def __init__(self, base_url: str, base_pages_path: str):
         self.base_url = base_url
         self.base_pages_path = base_pages_path
         self.toc_ext = GitWikiTocExtension()
 
-    def render_page(self, path_on_disk):
+    def render_page(self, path_on_disk: str) -> tuple[str, str]:
         input_file = codecs.open(path_on_disk, mode="r", encoding="utf-8")
         text = input_file.read()
         html_content = markdown.markdown(text, extensions=[CodeHiliteExtension(cssclass='codehilite card'),
