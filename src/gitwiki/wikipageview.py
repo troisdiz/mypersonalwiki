@@ -42,7 +42,7 @@ class WikiView(View):
             print('PathNature default case -> 500')
             abort(500)
 
-    def return_wiki_page(self, page_path_on_disk, path_elements):
+    def return_wiki_page(self, page_path_on_disk: str, path_elements: list[str]) -> str:
 
         print(f"Wiki page view : path_elements={path_elements}")
 

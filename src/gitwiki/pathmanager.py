@@ -3,6 +3,7 @@ from os.path import exists
 from urllib import parse
 from enum import Enum
 from enum import unique
+from pathlib import Path
 
 from jinja2 import Environment, PackageLoader
 
@@ -84,12 +85,28 @@ class PathManager:
             loader=loader,
         )
         self.base_path = base_path
+        self.base_pathlib_path = Path(base_path)
 
     def get_templates_path(self):
         return self.templates_path
 
     def get_jinja_template(self, template_name):
         return self.jinja_env.get_template(template_name)
+
+    def get_sidebar_path(self, page_path: str) -> str | None:
+        """t
+        Returns the path to the sidebar source by looking in the current page folder and going up
+
+        :return: The path to the sidebar source
+        """
+        page_pathlib_path = Path(page_path)
+        current_page = page_pathlib_path.parent
+        while current_page.is_subpath_of(self.base_pathlib_path):
+            if current_page.contains('sidebar.md'):
+                return str((current_page / 'sidebar.md').absolute())
+            current_page = current_page.parent
+        return None
+
 
     # TODO implement
     def _contains_index(self, path: str) -> bool:

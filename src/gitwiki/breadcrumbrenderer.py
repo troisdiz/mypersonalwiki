@@ -28,7 +28,7 @@ class BreadcrumbRenderer:
             return ''
 
 
-def build_tuples(path_list: list[str]) -> Generator:
+def build_tuples(path_list: list[str]) -> Generator[tuple[list[str], str, bool]]:
     current_path = []
     path_list_len: int = len(path_list)
     yield current_path, 'Home', True
