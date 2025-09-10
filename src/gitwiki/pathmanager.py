@@ -8,6 +8,7 @@ from pathlib import Path
 from jinja2 import Environment, PackageLoader
 
 INDEX_FILE_NAME = 'index.md'
+SIDEBAR_FILE_NAME = '__sidebar.md'
 URL_CHARACTER_SEPARATOR = '/'
 
 
@@ -102,8 +103,8 @@ class PathManager:
         page_pathlib_path = Path(page_path)
         current_page = page_pathlib_path.parent
         while current_page.is_subpath_of(self.base_pathlib_path):
-            if current_page.contains('sidebar.md'):
-                return str((current_page / 'sidebar.md').absolute())
+            if current_page.contains(SIDEBAR_FILE_NAME):
+                return str((current_page / SIDEBAR_FILE_NAME).absolute())
             current_page = current_page.parent
         return None
 
