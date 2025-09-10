@@ -7,13 +7,13 @@ class TestGitWikiBreadcrumbs(unittest.TestCase):
 
     def test_build_tuples_empty(self):
         real = [it for it in build_tuples([])]
-        expected = [([], 'Home')]
+        expected = [([], 'Home', True)]
         self.print_and_assert(real, expected)
 
     def test_build_tuples_1(self):
         item_name = 'Item1'
         real = [it for it in build_tuples([item_name])]
-        expected = [([], 'Home'), ([item_name], item_name)]
+        expected = [([], 'Home', True), ([item_name], item_name, False)]
         self.print_and_assert(real, expected)
 
     def print_and_assert(self, real, expected):
@@ -23,5 +23,5 @@ class TestGitWikiBreadcrumbs(unittest.TestCase):
 
     def test_render(self):
         bcr = BreadcrumbRenderer('/pages/')
-        self.assertEqual('<li>    <a href="/pages/">Home</a></li>',
+        self.assertEqual('<li class="breadcrumb-item">    <a href="/pages/">Home</a></li>',
                          bcr.render_path([]))
