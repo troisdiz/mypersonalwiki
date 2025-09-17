@@ -22,7 +22,6 @@ jobs:
         with:
           node-version: '22.x'
           # cache: 'yarn'
-          working-directory: ./static
       - name: Enable corepack
         working-directory: ./static
         run: |
