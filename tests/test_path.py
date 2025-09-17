@@ -12,7 +12,8 @@ class TestGitWikiPathUrls(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory("TestDownloadToday", "")
         temp_folder = self.temp_dir.name
-        self.path_manager = PathManager(temp_folder)
+        program_base_path = os.path.dirname(os.path.realpath(__file__))
+        self.path_manager = PathManager(program_base_path, temp_folder)
 
     def tearDown(self):
         self.temp_dir.cleanup()
