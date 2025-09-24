@@ -15,7 +15,7 @@ class PageRenderer:
     def render_page(self, path_on_disk: str) -> tuple[str, str]:
         input_file = codecs.open(path_on_disk, mode="r", encoding="utf-8")
         text = input_file.read()
-        html_content = markdown.markdown(text, extensions=[CodeHiliteExtension(cssclass='codehilite card'),
+        html_content = markdown.markdown(text, extensions=[CodeHiliteExtension(cssclass='codehilite card', linenums=True),
                                                            'markdown.extensions.fenced_code',
                                                            self.toc_ext,
                                                            GitWikiLinkExtension(base_url=self.base_url,
