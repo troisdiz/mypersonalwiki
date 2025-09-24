@@ -1,3 +1,17 @@
-body {
-    font-size: 14px;
+/* Ensure bold titles */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+}
+
+/* Ensure there is some padding around code in code blocks */
+div.codehilite {
+    padding: 0.5em 0.5em 0;
+}
+
+/* Prevents line numbers to be selected on code blocks */
+td.linenos {
+    user-select: none;  /* Prevents text selection */
+    -webkit-user-select: none; /* Safari/Chrome */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE/Edge */
 }
