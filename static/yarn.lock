@@ -97,6 +97,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mermaid-js/tiny@npm:^11.12.0":
+  version: 11.12.0
+  resolution: "@mermaid-js/tiny@npm:11.12.0"
+  checksum: 10c0/a7ec64f1d8c12754f85462e7beaa875b0070a6a2fddc53981cddf9e418223c41445d982bf03456305deba984a59dc63372e104b89a7d5e1df506d6e34d48ea3e
+  languageName: node
+  linkType: hard
+
 "@npmcli/agent@npm:^3.0.0":
   version: 3.0.0
   resolution: "@npmcli/agent@npm:3.0.0"
@@ -2433,6 +2440,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "static@workspace:."
   dependencies:
+    "@mermaid-js/tiny": "npm:^11.12.0"
     autoprefixer: "npm:^10.4.21"
     css-loader: "npm:^7.1.2"
     html-webpack-plugin: "npm:^5.6.3"
