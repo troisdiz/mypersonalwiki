@@ -2,6 +2,7 @@ import codecs
 import markdown
 from markdown.extensions.codehilite import CodeHiliteExtension
 from gitwiki.extensions.gitwikilinks import GitWikiLinkExtension
+from gitwiki.extensions.gitwikimermaid import GitWikiMermaidExtension
 from gitwiki.extensions.gitwikitoc import GitWikiTocExtension
 
 
@@ -19,6 +20,7 @@ class PageRenderer:
                                                            'markdown.extensions.fenced_code',
                                                            self.toc_ext,
                                                            GitWikiLinkExtension(base_url=self.base_url,
-                                                                                end_url='')])
+                                                                                end_url=''),
+                                                           GitWikiMermaidExtension()])
         toc_content = self.toc_ext.toc
         return toc_content, html_content
