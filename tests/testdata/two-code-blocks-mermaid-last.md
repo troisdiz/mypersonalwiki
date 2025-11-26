@@ -1,8 +1,8 @@
 # Titre 1
 
 ```python
-def foo():
-    return "bar"
+    def foo():
+      return "bar"
 ```
 
 ```mermaid
