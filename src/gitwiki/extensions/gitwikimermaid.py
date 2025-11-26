@@ -17,7 +17,7 @@ class MermaidPreprocessor(Preprocessor):
             if line.startswith('```mermaid'):
                 in_mermaid_block = True
                 mermaid_lines.append("<div class=\"mermaid\">")
-            elif line.startswith('```'):
+            elif in_mermaid_block and line.startswith('```'):
                 in_mermaid_block = False
                 mermaid_lines.append("</div>")
             else:
