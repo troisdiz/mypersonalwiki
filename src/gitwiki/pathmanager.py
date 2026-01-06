@@ -1,8 +1,10 @@
 from os.path import join
 from os.path import exists
+from pathlib import Path
 from urllib import parse
 from enum import Enum
 from enum import unique
+from functools import cmp_to_key
 from pathlib import Path
 
 from jinja2 import Environment, PackageLoader
@@ -21,11 +23,14 @@ class PathNature(Enum):
     folder_without_index = 4
     folder_with_index = 5
 
+    def can_have_children(self) -> bool:
+        return self.value > PathNature.other_resource_file.value
+
 
 class PathInfo:
-    def __init__(self, path_nature: PathNature, path_on_disk: str, url_items: list[str] = None):
+    def __init__(self, path_nature: PathNature, path_on_disk: Path, url_items: list[str] = None):
         self.pathNature: PathNature = path_nature
-        self.path_on_disk: str = path_on_disk
+        self.path_on_disk: Path = path_on_disk
         # TODO
         if url_items is None:
             self.url_items = []
@@ -34,10 +39,19 @@ class PathInfo:
 
     def __str__(self) -> str:
         if self.path_on_disk is not None:
-            path_on_disk = self.path_on_disk
+            path_on_disk_str = self.path_on_disk
         else:
-            path_on_disk = 'N/A'
-        return f"{self.pathNature} [{path_on_disk}] / url items {self.url_items}"
+            path_on_disk_str = 'N/A'
+        return f"{self.pathNature} [{path_on_disk_str}] / url items {self.url_items}"
+
+    def name(self):
+        return self.url_items[-1]
+
+
+def path_info_child_of(parent: PathInfo, child_name: str) -> PathInfo:
+    if not parent.pathNature.can_have_children():
+        raise f"{parent} can't have children"
+    return None
 
 
 class MalFormedGitWikiUrl(Exception):
@@ -108,6 +122,26 @@ class PathManager:
             current_page = current_page.parent
         return None
 
+    def get_sibling_paths(self, path_info: PathInfo) -> list[PathInfo]:
+        source_path = Path(path_info.path_on_disk)
+        children = [item for item in source_path.parent.iterdir()]
+        # dir
+
+        def compare_func(p1: Path, p2: Path):
+            if p1.is_dir() and p2.is_dir():
+                return p1.name > p2.name
+            elif p1.is_file() and p2.is_file():
+                return p1.name > p2.name
+            elif p1.is_file() and p2.is_dir():
+                return -1
+            else:
+                return 1
+        sorted_children = sorted(children, key=cmp_to_key(compare_func))
+        # files
+        return [
+            PathInfo(PathNature.folder_with_index, child, path_info.url_items + [child.name])
+            for child in sorted_children
+        ]
 
     # TODO implement
     def _contains_index(self, path: str) -> bool:
@@ -131,7 +165,7 @@ class PathManager:
 
         # if url starts with splash, remove it
         if raw_path_elts[0] == '':
-            unslashed_decoded_url_path = decoded_url_path[1:]
+            unslashed_decoded_url_path: str = decoded_url_path[1:]
             cleaned_path_elts = raw_path_elts[1:]
 
         # test is true if last char is '/' and then split returns empty
@@ -147,7 +181,7 @@ class PathManager:
             else:
                 path_nature = PathNature.not_found
             return PathInfo(path_nature=path_nature,
-                            path_on_disk=join(self.base_path, unslashed_decoded_url_path, INDEX_FILE_NAME),
+                            path_on_disk=Path(join(self.base_path, unslashed_decoded_url_path, INDEX_FILE_NAME)),
                             url_items=cleaned_path_elts)
 
         # File case : look for extension

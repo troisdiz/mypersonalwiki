@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from string import Template
 
 from flask.views import View
@@ -10,7 +12,7 @@ from gitwiki.pathmanager import PathInfo, PathNature, PathManager
 
 class WikiView(View):
     def __init__(self, path_manager: PathManager, page_renderer: PageRenderer, breadcrumb_renderer: BreadcrumbRenderer):
-        self.path_manager = path_manager
+        self.path_manager: PathManager = path_manager
         self.page_renderer = page_renderer
         self.breadcrumb_renderer = breadcrumb_renderer
 
@@ -34,7 +36,7 @@ class WikiView(View):
             # TODO mime type
             return send_file(path_info.path_on_disk, mimetype='image/png')
         elif (path_info.pathNature == PathNature.folder_with_index) | (path_info.pathNature == PathNature.md_file):
-            return self.return_wiki_page(path_info.path_on_disk, path_info.url_items)
+            return self.return_wiki_page(path_info, Path(path_info.path_on_disk), path_info.url_items)
         elif path_info.pathNature == PathNature.folder_without_index:
             print('PathNature folder without index : TODO 3')
             abort(500)
@@ -42,16 +44,22 @@ class WikiView(View):
             print('PathNature default case -> 500')
             abort(500)
 
-    def return_wiki_page(self, page_path_on_disk: str, path_elements: list[str]) -> str:
+    def return_wiki_page(self, path_info: PathInfo, page_path_on_disk: Path, path_elements: list[str]) -> str:
 
         print(f"Wiki page view : path_elements={path_elements}")
 
-        toc_content, html_content = self.page_renderer.render_page(page_path_on_disk)
+        toc_content, html_content = self.page_renderer.render_page(str(page_path_on_disk.absolute()))
         breadcrumb_content = self.breadcrumb_renderer.render_path(path_elements)
         relative_to_root = ".."
         for i in range(len(path_elements)):
             relative_to_root = relative_to_root + "/.."
         sidebar_content = "Sidebar Content"
+        children: list[PathInfo] = self.path_manager.get_sibling_paths(path_info)
+        sidebar_content = "<ul>\n"
+        for child in children:
+            sidebar_content += f"    <li>{child.url_items[-1]}</li>\n"
+
+        sidebar_content += "</ul>\n"
         return render_template(self.index_template,
                                relative_to_root=relative_to_root,
                                content=html_content,
