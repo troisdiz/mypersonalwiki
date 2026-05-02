@@ -7,16 +7,21 @@ from flask import render_template, abort, send_file
 
 from gitwiki.breadcrumbrenderer import BreadcrumbRenderer
 from gitwiki.pagerenderer import PageRenderer
-from gitwiki.pathmanager import PathInfo, PathNature, PathManager
+from gitwiki.pathmanager import PathInfo, PathNature, PathManager, TemplateManager
 
 
 class WikiView(View):
-    def __init__(self, path_manager: PathManager, page_renderer: PageRenderer, breadcrumb_renderer: BreadcrumbRenderer):
+    def __init__(self,
+                 path_manager: PathManager,
+                 template_manager: TemplateManager,
+                 page_renderer: PageRenderer,
+                 breadcrumb_renderer: BreadcrumbRenderer):
         self.path_manager: PathManager = path_manager
-        self.page_renderer = page_renderer
-        self.breadcrumb_renderer = breadcrumb_renderer
+        self.template_manager: TemplateManager = template_manager
+        self.page_renderer: PageRenderer = page_renderer
+        self.breadcrumb_renderer: BreadcrumbRenderer = breadcrumb_renderer
 
-        self.index_template = path_manager.get_jinja_template('index.html')
+        self.index_template = self.template_manager.get_jinja_template('index.html')
 
     def dispatch_request(self, path):
 
@@ -46,7 +51,10 @@ class WikiView(View):
 
     def return_wiki_page(self, path_info: PathInfo, page_path_on_disk: Path, path_elements: list[str]) -> str:
 
-        print(f"Wiki page view : path_elements={path_elements}")
+        print("Enter return_wiki_page")
+        print(f"    path_info = {path_info}")
+        print(f"    page_path_on_disk = {page_path_on_disk}")
+        print(f"    path_elements={path_elements}")
 
         toc_content, html_content = self.page_renderer.render_page(str(page_path_on_disk.absolute()))
         breadcrumb_content = self.breadcrumb_renderer.render_path(path_elements)
@@ -55,9 +63,12 @@ class WikiView(View):
             relative_to_root = relative_to_root + "/.."
         sidebar_content = "Sidebar Content"
         children: list[PathInfo] = self.path_manager.get_sibling_paths(path_info)
+        print(f"Found {len(children)} siblings")
+        for child in children:
+            print(f"Found child : {child}")
         sidebar_content = "<ul>\n"
         for child in children:
-            sidebar_content += f"    <li>{child.url_items[-1]}</li>\n"
+            sidebar_content += f"    <li>{child.name()}</li>\n"
 
         sidebar_content += "</ul>\n"
         return render_template(self.index_template,
