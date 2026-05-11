@@ -31,7 +31,9 @@ class PathNature(Enum):
 
 class PathInfo:
     def __init__(self, path_nature: PathNature, path_on_disk: Path | None, url_items: list[str] = None):
-        if path_on_disk is None:
+        if path_nature is not PathNature.not_found and \
+                path_nature is not PathNature.other_resource_not_found and \
+                path_on_disk is None:
             raise Exception(f"cannot create PathInfo because path_on_disk is None (url_items = {str(url_items)}")
 
         self.pathNature: PathNature = path_nature
@@ -168,8 +170,13 @@ class PathManager:
 
         sorted_children = sorted(children, key=cmp_to_key(compare_func))
         # files
+        parent: PathInfo
+        if path_info.is_root():
+            parent = path_info
+        else:
+            parent = path_info.parent()
         sibling_path_infos = [
-            path_info_child_of(path_info.parent(), child.name)
+            path_info_child_of(parent, child.name)
             for child in sorted_children
         ]
 
@@ -222,16 +229,16 @@ class PathManager:
         if raw_path_elts[-1] == '':
             # Folder case
             path_nature = None
-            if self._exists_on_disk(self.base_pathlib_path / unslashed_decoded_url_path):
-                if self._contains_index(self.base_pathlib_path / unslashed_decoded_url_path):
+            path_on_disk = self.base_pathlib_path / unslashed_decoded_url_path
+            if self._exists_on_disk(path_on_disk):
+                if self._contains_index(path_on_disk):
                     path_nature = PathNature.folder_with_index
                 else:
                     path_nature = PathNature.folder_without_index
             else:
                 path_nature = PathNature.not_found
             return PathInfo(path_nature=path_nature,
-                            # TODO suspicious when there is no index!!!
-                            path_on_disk=self.base_pathlib_path / unslashed_decoded_url_path / INDEX_FILE_NAME,
+                            path_on_disk=self.base_pathlib_path / unslashed_decoded_url_path,
                             url_items=cleaned_path_elts)
 
         # File case : look for extension

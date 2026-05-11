@@ -7,7 +7,7 @@ from flask import render_template, abort, send_file
 
 from gitwiki.breadcrumbrenderer import BreadcrumbRenderer
 from gitwiki.pagerenderer import PageRenderer
-from gitwiki.pathmanager import PathInfo, PathNature, PathManager, TemplateManager
+from gitwiki.pathmanager import PathInfo, PathNature, PathManager, TemplateManager, INDEX_FILE_NAME
 
 
 class WikiView(View):
@@ -56,7 +56,12 @@ class WikiView(View):
         print(f"    page_path_on_disk = {page_path_on_disk}")
         print(f"    path_elements={path_elements}")
 
-        toc_content, html_content = self.page_renderer.render_page(str(page_path_on_disk.absolute()))
+        toc_content, html_content = None, None
+        if path_info.pathNature is PathNature.folder_without_index:
+            toc_content, html_content = self.page_renderer.render_folder_without_index(path_on_disk=page_path_on_disk)
+        else:
+            toc_content, html_content = self.page_renderer.render_page(path_on_disk=page_path_on_disk)
+
         breadcrumb_content = self.breadcrumb_renderer.render_path(path_elements)
         relative_to_root = ".."
         for i in range(len(path_elements)):
