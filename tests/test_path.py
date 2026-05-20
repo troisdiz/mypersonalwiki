@@ -19,6 +19,9 @@ class TestGitWikiPathUrls(unittest.TestCase):
         index_path: Path = self.temp_folder_path / 'index.md'
         index_path.touch()
 
+        other_path: Path = self.temp_folder_path / 'other.md'
+        other_path.touch()
+
         jpeg_path: Path = self.temp_folder_path / 'jpeg.jpg'
         jpeg_path.touch()
 
@@ -85,6 +88,8 @@ class TestGitWikiPathUrls(unittest.TestCase):
         self.assertIsNotNone(path_info, "get_path_info_from_url should NOT return None")
         self.assertIsNotNone(path_info.path_on_disk, "get_path_info_from_url should NOT return a PathInfo with path_on_disk None")
         sibling_paths: list[PathInfo] = self.path_manager.get_sibling_paths(path_info)
+
+        self.assertEqual(1, len(sibling_paths), "There should be one sibling path")
         print("\nSiblings START")
         for sibling_path in sibling_paths:
             print(str(sibling_path))
@@ -103,6 +108,12 @@ class TestGitWikiPathUrls(unittest.TestCase):
             os.makedirs(basedir)
         with open(full_path, 'a'):
             os.utime(full_path, None)
+
+    def test_relative(self):
+        sub_path = Path("/toto/tutu/titi.md")
+        base = Path("/toto/")
+        self.assertTrue(sub_path.is_relative_to(base))
+        print(f"\n#{sub_path.relative_to(base).parts}#")
 
 if __name__ == '__main__':
     unittest.main()

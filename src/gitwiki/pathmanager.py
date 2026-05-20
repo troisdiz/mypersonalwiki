@@ -57,6 +57,9 @@ class PathInfo:
     def is_root(self):
         return len(self.url_items) == 0
 
+    def is_folder(self):
+        return self.pathNature == PathNature.folder_with_index or self.pathNature == PathNature.folder_without_index
+
     def parent(self) -> PathInfo:
         if self.is_root():
             raise Exception(f"{self} is a root path")
@@ -65,10 +68,37 @@ class PathInfo:
                         url_items=self.url_items[:-1])
 
 
+def _contains_index(path: Path) -> bool:
+        return (path / INDEX_FILE_NAME).exists()
+
+
+def _get_nature(path_on_disk: Path) -> PathNature:
+    path_nature: PathNature = PathNature.not_found
+    if path_on_disk.exists():
+        if path_on_disk.is_dir():
+            if _contains_index(path_on_disk):
+                path_nature = PathNature.folder_with_index
+            else:
+                path_nature = PathNature.folder_without_index
+        else:
+            extension = path_on_disk.suffix
+            match extension:
+                case ".md":
+                    if path_on_disk.name == "index.md":
+                        path_nature = PathNature.folder_with_index
+                    elif path_on_disk.name == "__sidebar.md":
+                        path_nature = PathNature.sidebar
+                    else:
+                        path_nature = PathNature.md_file
+                case _:
+                    path_nature = PathNature.other_resource_file
+    return path_nature
+
+
 def path_info_child_of(parent: PathInfo, child_name: str) -> PathInfo:
     if not parent.pathNature.can_have_children():
         raise Exception(f"{parent} of nature {parent.pathNature} can't have children (proposed child is {child_name})")
-    return PathInfo(path_nature=None,
+    return PathInfo(path_nature=_get_nature(parent.path_on_disk / child_name,),
                     path_on_disk=parent.path_on_disk / child_name,
                     url_items=parent.url_items + [child_name])
 
@@ -79,12 +109,6 @@ class MalFormedGitWikiUrl(Exception):
         self.message = message
 
 
-# class GitWikiUrl:
-#     # 2 subslasses (abs and rel ?)
-#     def __init__(self, is_absolute, path_elements):
-#         self.is_absolute = is_absolute
-#         self.path_elements = path_elements
-#
 #     def canonize(self) -> 'GitWikiUrl':
 #         path_elements = self.path_elements
 #         while True:
@@ -150,14 +174,10 @@ class PathManager:
         return None
 
     def get_sibling_paths(self, path_info: PathInfo) -> list[PathInfo]:
-        # if not path_info.pathNature.can_have_children():
-        #     raise Exception(f"{path_info} of nature {path_info.pathNature} can't have children")
-
         source_path = path_info.path_on_disk
         children = [item for item in source_path.parent.iterdir()]
 
         # dir
-
         def compare_func(p1: Path, p2: Path):
             if p1.is_dir() and p2.is_dir():
                 return p1.name > p2.name
@@ -171,10 +191,11 @@ class PathManager:
         sorted_children = sorted(children, key=cmp_to_key(compare_func))
         # files
         parent: PathInfo
-        if path_info.is_root():
+        if path_info.is_folder():
             parent = path_info
         else:
             parent = path_info.parent()
+
         sibling_path_infos = [
             path_info_child_of(parent, child.name)
             for child in sorted_children
@@ -190,8 +211,24 @@ class PathManager:
                        or path_info.pathNature == PathNature.md_file
                )
         ]
-
+        print(f"get_sibling_paths called with {path_info}")
+        print(f"    returns {folder_and_pages}")
         return folder_and_pages
+
+    def get_closest_sidebar(self, path_info: PathInfo) -> PathInfo | None:
+        parent: PathInfo
+        if path_info.is_folder():
+            parent = path_info
+        else:
+            parent = path_info.parent()
+
+        source_path = path_info.path_on_disk
+        for i in range(len(path_info.url_items), 0, -1):
+            has_sidebar = len([child.name for child in source_path.iterdir() if child.name == "__sidebar.md"]) == 1
+            if has_sidebar:
+                return PathInfo(PathNature.sidebar, source_path, path_info.url_items[0:i])
+        return None
+
 
     def get_parent_path_info(self, path_info: PathInfo) -> PathInfo:
         if path_info.path_on_disk == self.base_pathlib_path:
@@ -199,12 +236,15 @@ class PathManager:
             return None
         return PathInfo(PathNature.folder_with_index, path_info.path_on_disk.parent, path_info.url_items[-1])
 
-    def _contains_index(self, path: Path) -> bool:
-        return self._exists_on_disk(path / INDEX_FILE_NAME)
-
     def _exists_on_disk(self, path: Path) -> bool:
         # TODO already includes base_path ?
         return path.exists()
+
+    def url_from_path(self, path_info: PathInfo) -> str:
+        if not path_info.path_on_disk.is_relative_to(self.base_pathlib_path):
+            raise f"Cannot create a url for a path not under {self.base_pathlib_path}"
+        relative_path: Path = path_info.path_on_disk.relative_to(self.base_pathlib_path)
+        return "/".join(list(relative_path.parts))
 
     def get_path_info_from_url(self, raw_url_path: str) -> PathInfo:
         # TODO portability because of separator
@@ -228,15 +268,15 @@ class PathManager:
         # string at the end
         if raw_path_elts[-1] == '':
             # Folder case
-            path_nature = None
             path_on_disk = self.base_pathlib_path / unslashed_decoded_url_path
-            if self._exists_on_disk(path_on_disk):
-                if self._contains_index(path_on_disk):
-                    path_nature = PathNature.folder_with_index
-                else:
-                    path_nature = PathNature.folder_without_index
-            else:
-                path_nature = PathNature.not_found
+            path_nature = _get_nature(path_on_disk)
+            # if self._exists_on_disk(path_on_disk):
+            #    if self._contains_index(path_on_disk):
+            #        path_nature = PathNature.folder_with_index
+            #    else:
+            #        path_nature = PathNature.folder_without_index
+            # else:
+            #    path_nature = PathNature.not_found
             return PathInfo(path_nature=path_nature,
                             path_on_disk=self.base_pathlib_path / unslashed_decoded_url_path,
                             url_items=cleaned_path_elts)

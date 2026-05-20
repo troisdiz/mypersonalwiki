@@ -1,6 +1,4 @@
 from flask.views import View
-from flask import render_template
-from flask import Response
 from flask import send_from_directory
 
 from gitwiki.pathmanager import PathManager, TemplateManager
