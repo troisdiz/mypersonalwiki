@@ -74,8 +74,7 @@ class WikiView(View):
         relative_to_root = ".."
         for i in range(len(path_elements)):
             relative_to_root = relative_to_root + "/.."
-        children: list[PathInfo] = self.path_manager.get_sibling_paths(path_info)
-
+        children: list[tuple[PathInfo, bool]] = self.path_manager.get_sibling_paths(path_info)
 
         sidebar_content = self.sidebar_renderer.render_sidebar(children)
 

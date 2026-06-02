@@ -16,7 +16,7 @@ BASE_PAGE_URL = '/pages/'
 def create_flask_app(base_pages_path: str) -> flask.Flask:
     program_base_path = os.path.dirname(os.path.realpath(__file__))
 
-    path_manager = PathManager(Path(base_pages_path))
+    path_manager = PathManager(Path(base_pages_path), BASE_PAGE_URL)
     template_manager = TemplateManager(Path(program_base_path))
     page_renderer = PageRenderer(base_url=BASE_PAGE_URL, base_pages_path=base_pages_path)
     breadcrumb_renderer = BreadcrumbRenderer(BASE_PAGE_URL)
