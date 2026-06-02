@@ -8,6 +8,7 @@ from tempfile import TemporaryDirectory
 from gitwiki.pathmanager import PathManager, PathInfo
 from gitwiki.pathmanager import PathNature
 from gitwiki.pathmanager import find_extension
+from gitwiki.server import BASE_PAGE_URL
 
 
 class TestGitWikiPathUrls(unittest.TestCase):
@@ -26,7 +27,7 @@ class TestGitWikiPathUrls(unittest.TestCase):
         jpeg_path.touch()
 
         program_base_path = os.path.dirname(os.path.realpath(__file__))
-        self.path_manager = PathManager(self.temp_folder_path)
+        self.path_manager = PathManager(self.temp_folder_path, BASE_PAGE_URL)
 
     def tearDown(self):
         self.temp_dir.cleanup()
@@ -111,7 +112,7 @@ class TestGitWikiPathUrls(unittest.TestCase):
         for sibling_path in sibling_paths:
             print(str(sibling_path))
         print("Siblings END")
-        self.assertEqual(1, len(sibling_paths), "There should be one sibling path")
+        self.assertEqual(2, len(sibling_paths), "There should be one sibling path")
 
     def test_get_siblings_for_depth_2_with_index(self):
         url1 = '/toto/tutu/index'
