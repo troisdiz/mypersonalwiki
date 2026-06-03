@@ -21,7 +21,13 @@ var config = {
                 test: /\.css$/i,
                 use: [miniCssExtractPlugin.loader, 'css-loader'],
             },
+            {
+                // Handles font files referenced inside the CSS
+                test: /\.(woff|woff2|eot|ttf|otf)$/i,
+                type: 'asset/resource',
+            },
         ],
+
     },
 };
 

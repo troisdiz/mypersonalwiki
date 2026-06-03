@@ -1,4 +1,6 @@
 import codecs
+from pathlib import Path
+
 import markdown
 from markdown.extensions.codehilite import CodeHiliteExtension
 from gitwiki.extensions.gitwikilinks import GitWikiLinkExtension
@@ -13,8 +15,9 @@ class PageRenderer:
         self.base_pages_path = base_pages_path
         self.toc_ext = GitWikiTocExtension()
 
-    def render_page(self, path_on_disk: str) -> tuple[str, str]:
-        input_file = codecs.open(path_on_disk, mode="r", encoding="utf-8")
+    def render_page(self, path_on_disk: Path) -> tuple[str, str]:
+        print(f"Rendering page at path: {path_on_disk}")
+        input_file = path_on_disk.open(mode="r", encoding="utf-8")
         text = input_file.read()
         html_content = markdown.markdown(text, extensions=[CodeHiliteExtension(cssclass='codehilite card', linenums=True),
                                                            'markdown.extensions.fenced_code',
@@ -24,3 +27,6 @@ class PageRenderer:
                                                            GitWikiMermaidExtension()])
         toc_content = self.toc_ext.toc
         return toc_content, html_content
+
+    def render_folder_without_index(self, path_on_disk: Path) -> tuple[str, str]:
+        return "toc_content", "html_content"

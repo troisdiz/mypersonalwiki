@@ -1,8 +1,11 @@
+from __future__ import annotations
 from os.path import join
 from os.path import exists
+from pathlib import Path
 from urllib import parse
 from enum import Enum
 from enum import unique
+from functools import cmp_to_key
 from pathlib import Path
 
 from jinja2 import Environment, PackageLoader
@@ -20,24 +23,109 @@ class PathNature(Enum):
     other_resource_file = 3
     folder_without_index = 4
     folder_with_index = 5
+    sidebar = 6  # TODO use it!
+
+    def can_have_children(self) -> bool:
+        return self.value > PathNature.other_resource_file.value
 
 
 class PathInfo:
-    def __init__(self, path_nature: PathNature, path_on_disk: str, url_items: list[str] = None):
-        self.pathNature: PathNature = path_nature
-        self.path_on_disk: str = path_on_disk
+    def __init__(self, path_nature: PathNature, path_on_disk: Path | None, url_items: list[str] = None):
         # TODO
         if url_items is None:
             self.url_items = []
         else:
             self.url_items = url_items
 
+        self.pathNature: PathNature = path_nature
+        self.path_on_disk: Path = path_on_disk
+
+        if path_nature is not PathNature.not_found and \
+                path_nature is not PathNature.other_resource_not_found and \
+                path_on_disk is None:
+            raise Exception(f"cannot create PathInfo because path_on_disk is None (url_items = {str(url_items)}")
+
+        if path_nature is PathNature.folder_with_index and len(self.url_items) != 0 and self.url_items[-1] == "index":
+            raise Exception(f"cannot create PathInfo because url_items[-1] is 'index', path_on_disk is {str(path_on_disk)}")
+
+        if path_nature is PathNature.folder_with_index and path_on_disk.name.startswith("index"):
+            raise Exception(f"cannot create PathInfo because path_on_disk.name is 'index'")
+
     def __str__(self) -> str:
         if self.path_on_disk is not None:
-            path_on_disk = self.path_on_disk
+            path_on_disk_str = self.path_on_disk
         else:
-            path_on_disk = 'N/A'
-        return f"{self.pathNature} [{path_on_disk}] / url items {self.url_items}"
+            path_on_disk_str = 'N/A'
+        return f"[PI {self.pathNature.name} [{path_on_disk_str}] / url items {self.url_items}]"
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __eq__(self, other) -> bool:
+        if other is None:
+            return False
+        if self.pathNature != other.pathNature:
+            return False
+        if self.path_on_disk != other.path_on_disk:
+            return False
+        return True
+
+
+    def name(self):
+        return self.url_items[-1]
+
+    def is_root(self):
+        return len(self.url_items) == 0
+
+    def is_folder(self):
+        return self.pathNature == PathNature.folder_with_index or self.pathNature == PathNature.folder_without_index
+
+    def parent(self) -> PathInfo:
+        if self.is_root():
+            raise Exception(f"{self} is a root path")
+        return PathInfo(path_nature=PathNature.folder_without_index,
+                        path_on_disk=self.path_on_disk.parent,
+                        url_items=self.url_items[:-1])
+
+
+def _contains_index(path: Path) -> bool:
+        return (path / INDEX_FILE_NAME).exists()
+
+
+def _get_nature(path_on_disk: Path) -> PathNature:
+    path_nature: PathNature = PathNature.not_found
+    if path_on_disk.exists():
+        if path_on_disk.is_dir():
+            if _contains_index(path_on_disk):
+                path_nature = PathNature.folder_with_index
+            else:
+                path_nature = PathNature.folder_without_index
+        else:
+            extension = path_on_disk.suffix
+            match extension:
+                case ".md":
+                    if path_on_disk.name == "index.md":
+                        path_nature = PathNature.folder_with_index
+                    elif path_on_disk.name == "__sidebar.md":
+                        path_nature = PathNature.sidebar
+                    else:
+                        path_nature = PathNature.md_file
+                case _:
+                    path_nature = PathNature.other_resource_file
+    return path_nature
+
+
+def path_info_child_of(parent: PathInfo, child_name: str) -> PathInfo:
+    if not parent.pathNature.can_have_children():
+        raise Exception(f"{parent} of nature {parent.pathNature} can't have children (proposed child is {child_name})")
+    path_on_disk: Path = parent.path_on_disk / child_name
+    url_items = parent.url_items + [child_name]
+    if child_name == "index.md":
+        path_on_disk = path_on_disk.parent
+        url_items = url_items[:-1]
+    return PathInfo(path_nature=_get_nature(parent.path_on_disk / child_name,),
+                    path_on_disk=path_on_disk,
+                    url_items=url_items)
 
 
 class MalFormedGitWikiUrl(Exception):
@@ -46,26 +134,39 @@ class MalFormedGitWikiUrl(Exception):
         self.message = message
 
 
-class GitWikiUrl:
-    # 2 subslasses (abs and rel ?)
-    def __init__(self, is_absolute, path_elements):
-        self.is_absolute = is_absolute
-        self.path_elements = path_elements
+#     def canonize(self) -> 'GitWikiUrl':
+#         path_elements = self.path_elements
+#         while True:
+#             try:
+#                 index = path_elements.index('..')
+#                 if index <= 0:
+#                     if self.is_absolute:
+#                         raise MalFormedGitWikiUrl('Too much ..')
+#                     else:
+#                         break
+#                 path_elements = path_elements[:index - 1] + path_elements[index + 1:]
+#             except ValueError:
+#                 break
+#         return GitWikiUrl(self.is_absolute, path_elements)
 
-    def canonize(self) -> 'GitWikiUrl':
-        path_elements = self.path_elements
-        while True:
-            try:
-                index = path_elements.index('..')
-                if index <= 0:
-                    if self.is_absolute:
-                        raise MalFormedGitWikiUrl('Too much ..')
-                    else:
-                        break
-                path_elements = path_elements[:index-1] + path_elements[index+1:]
-            except ValueError:
-                break
-        return GitWikiUrl(self.is_absolute, path_elements)
+class TemplateManager:
+    def __init__(self, templates_base_path: Path):
+        self.templates_path = join(templates_base_path, 'templates')
+        loader = PackageLoader("gitwiki", "templates")
+        self.jinja_env = Environment(
+            loader=loader,
+        )
+
+    def get_templates_path(self):
+        """
+        Path for the templates folder (it contains both the Jinja template and the static generic files to far)
+        # TODO: shouldn't Jinja templates and static files be in different folders?
+        :return:
+        """
+        return self.templates_path
+
+    def get_jinja_template(self, template_name):
+        return self.jinja_env.get_template(template_name)
 
 
 class PathManager:
@@ -73,26 +174,16 @@ class PathManager:
     PathManager is responsible for managing paths in gitwiki
 
     """
-    def __init__(self, templates_base_path, base_path):
+
+    def __init__(self, base_path: Path, base_page_url: str):
         """
         Creates a PathManager instance
 
-        :param templates_base_path: The parent of the gitwiki templates repository where the templates folder is located
         :param base_path: The root of the wiki repository, where the pages and other assets are stored
         """
-        self.templates_path = join(templates_base_path, 'templates')
-        loader = PackageLoader("gitwiki", "templates")
-        self.jinja_env = Environment(
-            loader=loader,
-        )
-        self.base_path = base_path
-        self.base_pathlib_path = Path(base_path)
 
-    def get_templates_path(self):
-        return self.templates_path
-
-    def get_jinja_template(self, template_name):
-        return self.jinja_env.get_template(template_name)
+        self.base_pathlib_path = base_path
+        self.base_page_url: str = base_page_url
 
     def get_sidebar_path(self, page_path: str) -> str | None:
         """t
@@ -108,14 +199,111 @@ class PathManager:
             current_page = current_page.parent
         return None
 
+    def get_sibling_paths(self, path_info: PathInfo) -> list[tuple[PathInfo, bool]]:
+        source_path = path_info.path_on_disk
+        parent_path_on_disk = path_info.path_on_disk
+        if not path_info.pathNature == PathNature.folder_with_index:
+            parent_path_on_disk = parent_path_on_disk.parent
+        children = [item for item in parent_path_on_disk.iterdir()
+                    if item.suffix == ".md" or (item.is_dir() and not item.name.startswith("."))]
 
-    # TODO implement
-    def _contains_index(self, path: str) -> bool:
-        return self._exists_on_disk(join(path, INDEX_FILE_NAME))
+        # dir
+        def compare_func(p1: Path, p2: Path):
+            if p1.is_dir() and p2.is_dir():
+                if p1.name == p2.name:
+                    return 0
+                elif p1.name > p2.name:
+                    return -1
+                else:
+                    return 1
+            elif p1.is_file() and p2.is_file():
+                if p1.name == p2.name:
+                    return 0
+                elif p1.name > p2.name:
+                    return -1
+                else:
+                    return 1
+            elif p1.is_file() and p2.is_dir():
+                return -1
+            else:
+                return 1
 
-    def _exists_on_disk(self, path: str) -> bool:
+        sorted_children = sorted(children, key=cmp_to_key(compare_func))
+        # files
+        parent: PathInfo
+        if path_info.is_folder():
+            parent = path_info
+        else:
+            parent = path_info.parent()
+
+        sibling_path_infos = [
+            path_info_child_of(parent, child.name)
+            for child in sorted_children
+        ]
+
+        folder_and_pages = [
+            (path_info, path_info.path_on_disk == source_path)
+            for path_info in sibling_path_infos
+            if (
+                    path_info.pathNature == PathNature.folder_with_index
+                    or path_info.pathNature == PathNature.folder_without_index
+                    or path_info.pathNature == PathNature.md_file
+            )
+        ]
+        print(f"get_sibling_paths called with {path_info}")
+        print(f"    returns {folder_and_pages}")
+        return folder_and_pages
+
+    def get_closest_sidebar(self, path_info: PathInfo) -> PathInfo | None:
+        parent: PathInfo
+        if path_info.is_folder():
+            parent = path_info
+        else:
+            parent = path_info.parent()
+
+        source_path = path_info.path_on_disk
+        for i in range(len(path_info.url_items), 0, -1):
+            has_sidebar = len([child.name for child in source_path.iterdir() if child.name == "__sidebar.md"]) == 1
+            if has_sidebar:
+                return PathInfo(PathNature.sidebar, source_path, path_info.url_items[0:i])
+        return None
+
+
+    def get_parent_path_info(self, path_info: PathInfo) -> PathInfo:
+        if path_info.path_on_disk == self.base_pathlib_path:
+            # Prevent going below the root
+            return None
+        return PathInfo(PathNature.folder_with_index, path_info.path_on_disk.parent, path_info.url_items[-1])
+
+    def _exists_on_disk(self, path: Path) -> bool:
         # TODO already includes base_path ?
-        return exists(join(self.base_path, path))
+        return path.exists()
+
+    def url_from_path(self, path_info: PathInfo) -> str:
+        if not path_info.path_on_disk.is_relative_to(self.base_pathlib_path):
+            raise f"Cannot create a url for a path not under {self.base_pathlib_path}"
+
+        relative_path: Path = path_info.path_on_disk.relative_to(self.base_pathlib_path)
+        parts: list[str] = list(relative_path.parts)
+        relative_url = "/".join(parts)
+        match path_info.pathNature:
+            case PathNature.md_file:
+                relative_url = relative_url[:-3]
+            case PathNature.folder_with_index:
+                # relative_url = relative_url[:-3]
+                if not path_info.is_root():
+                    relative_url += "/"
+            case PathNature.folder_without_index:
+                relative_url += "/"
+
+        return self.base_page_url + relative_url
+
+    def title_from_path(self, path_info: PathInfo) -> str:
+        title = path_info.path_on_disk.name
+        match path_info.pathNature:
+            case PathNature.md_file:
+                title = title[:-3]
+        return title
 
     def get_path_info_from_url(self, raw_url_path: str) -> PathInfo:
         # TODO portability because of separator
@@ -126,28 +314,24 @@ class PathManager:
         decoded_url_path = parse.unquote(raw_url_path)
         raw_path_elts = decoded_url_path.split(URL_CHARACTER_SEPARATOR)
 
+        # Variables introduced to iterate (see below)
         unslashed_decoded_url_path = decoded_url_path
         cleaned_path_elts = raw_path_elts
 
         # if url starts with splash, remove it
         if raw_path_elts[0] == '':
-            unslashed_decoded_url_path = decoded_url_path[1:]
+            unslashed_decoded_url_path: str = decoded_url_path[1:]
             cleaned_path_elts = raw_path_elts[1:]
 
         # test is true if last char is '/' and then split returns empty
         # string at the end
         if raw_path_elts[-1] == '':
             # Folder case
-            path_nature = None
-            if self._exists_on_disk(unslashed_decoded_url_path):
-                if self._contains_index(unslashed_decoded_url_path):
-                    path_nature = PathNature.folder_with_index
-                else:
-                    path_nature = PathNature.folder_without_index
-            else:
-                path_nature = PathNature.not_found
+            path_on_disk = self.base_pathlib_path / unslashed_decoded_url_path
+            path_nature = _get_nature(path_on_disk)
+            # No need to remove index for folder with index because url ends with '/'
             return PathInfo(path_nature=path_nature,
-                            path_on_disk=join(self.base_path, unslashed_decoded_url_path, INDEX_FILE_NAME),
+                            path_on_disk=path_on_disk,
                             url_items=cleaned_path_elts)
 
         # File case : look for extension
@@ -158,19 +342,25 @@ class PathManager:
         if len(file_elts) == 1:
             # No extension
             path_nature = None
-            potential_md_path = join(self.base_path, unslashed_decoded_url_path + '.md')
-            if self._exists_on_disk(potential_md_path):
+            potential_md_path = self.base_pathlib_path / f"{unslashed_decoded_url_path}.md"
+            if potential_md_path.exists():
+                if potential_md_path.name == "index.md":
+                    folder_with_index_path = potential_md_path.parent
+                    return PathInfo(path_nature=PathNature.folder_with_index,
+                                    path_on_disk=folder_with_index_path,
+                                    url_items=cleaned_path_elts[:-1])
                 return PathInfo(path_nature=PathNature.md_file,
-                                path_on_disk=potential_md_path,
+                                path_on_disk=Path(potential_md_path),
                                 url_items=cleaned_path_elts)
             else:
                 return PathInfo(path_nature=PathNature.not_found,
                                 path_on_disk=None,
                                 url_items=cleaned_path_elts)
         else:
-            if self._exists_on_disk(unslashed_decoded_url_path):
+            absolute_md_path = self.base_pathlib_path / unslashed_decoded_url_path
+            if absolute_md_path.exists():
                 return PathInfo(path_nature=PathNature.other_resource_file,
-                                path_on_disk=join(self.base_path, decoded_url_path),
+                                path_on_disk=absolute_md_path,
                                 url_items=file_parent_url_items)
             else:
                 return PathInfo(path_nature=PathNature.other_resource_not_found,
