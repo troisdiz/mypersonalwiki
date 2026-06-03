@@ -3,6 +3,6 @@ Jinja2==3.1.6
 # To workaround a bug introduced in 2.1.0
 # markupsafe==2.0.1
 Markdown==3.8.2
-Pygments==2.19.2
+Pygments==2.20.0
 granian==2.5.0
 pytest==9.0.3
