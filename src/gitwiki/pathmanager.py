@@ -210,9 +210,19 @@ class PathManager:
         # dir
         def compare_func(p1: Path, p2: Path):
             if p1.is_dir() and p2.is_dir():
-                return p1.name > p2.name
+                if p1.name == p2.name:
+                    return 0
+                elif p1.name > p2.name:
+                    return -1
+                else:
+                    return 1
             elif p1.is_file() and p2.is_file():
-                return p1.name > p2.name
+                if p1.name == p2.name:
+                    return 0
+                elif p1.name > p2.name:
+                    return -1
+                else:
+                    return 1
             elif p1.is_file() and p2.is_dir():
                 return -1
             else:

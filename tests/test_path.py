@@ -127,10 +127,10 @@ class TestGitWikiPathUrls(unittest.TestCase):
 
         sibling_paths: list[tuple[PathInfo, bool]] = self.path_manager.get_sibling_paths(path_info1)
         self.assertEqual(2, len(sibling_paths), "There should be one sibling path + itself")
-        self.assertEqual(path_info1, sibling_paths[0][0])
-        self.assertTrue(sibling_paths[0][1])
-        self.assertEqual(path_info2, sibling_paths[1][0])
-        self.assertFalse(sibling_paths[1][1])
+        self.assertEqual(path_info1, sibling_paths[1][0])
+        self.assertTrue(sibling_paths[1][1])
+        self.assertEqual(path_info2, sibling_paths[0][0])
+        self.assertFalse(sibling_paths[0][1])
 
         print("\nSiblings START")
         for sibling_path in sibling_paths:
