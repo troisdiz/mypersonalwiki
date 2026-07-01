@@ -61,5 +61,19 @@
     </div>
   </div>
 </div>
+<script>
+  document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+    const display = node.type.includes('mode=display');
+
+    const math = document.createElement(display ? 'div' : 'span');
+    math.textContent = display
+            ? `\\[${node.textContent}\\]`
+            : `\\(${node.textContent}\\)`;
+
+    node.replaceWith(math);
+  });
+
+  MathJax.typesetPromise();
+</script>
 </body>
 </html>

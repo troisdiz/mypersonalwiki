@@ -16,6 +16,12 @@ var config = {
         clean: true,
     },
 
+    resolve: {
+        fallback: {
+            module: false,
+        },
+    },
+
     module: {
         rules: [
             {

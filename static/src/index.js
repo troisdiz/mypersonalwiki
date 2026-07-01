@@ -9,5 +9,6 @@ import * as bootstrap from 'bootstrap'
 //import './style.css';
 
 import mermaid from '@mermaid-js/tiny';
-
 mermaid.initialize({ startOnLoad: true });
+
+import 'mathjax/tex-chtml.js';

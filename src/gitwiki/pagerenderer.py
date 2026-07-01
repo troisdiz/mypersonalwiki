@@ -34,7 +34,8 @@ class PageRenderer:
                                                            self.toc_ext,
                                                            GitWikiLinkExtension(base_url=self.base_url,
                                                                                 end_url=''),
-                                                           GitWikiMermaidExtension()])
+                                                           GitWikiMermaidExtension(),
+                                                           'mdx_math'])
         toc_content = self.toc_ext.toc
         if "title" in metadata:
             title = str(metadata['title'])
