@@ -64,7 +64,7 @@ var config = {
 function buildHtmlWebpackPlugin(mode) {
     console.log("In buildHtmlWebpackPlugin in mode " + mode);
     var templateParameters = {}
-    const templateNames = ["breadcrumb", "content", "sidebar", "table_of_content"];
+    const templateNames = ["title", "breadcrumb", "content", "sidebar", "table_of_content"];
     templateNames.forEach(name => {
         if (mode === 'production') {
             templateParameters[name] = `{{ ${name}|safe }}`;

@@ -1,13 +1,12 @@
 from pathlib import Path
+from typing import Any
 
-from string import Template
-
-from flask.views import View
 from flask import render_template, abort, send_file
+from flask.views import View
 
 from gitwiki.breadcrumbrenderer import BreadcrumbRenderer
-from gitwiki.pagerenderer import PageRenderer
-from gitwiki.pathmanager import PathInfo, PathNature, PathManager, TemplateManager, INDEX_FILE_NAME
+from gitwiki.pagerenderer import PageRenderer, RenderedPage
+from gitwiki.pathmanager import PathInfo, PathNature, PathManager, TemplateManager
 from gitwiki.sidebarrenderer import SidebarRenderer
 
 
@@ -46,7 +45,7 @@ class WikiView(View):
         elif (path_info.pathNature == PathNature.folder_with_index) | \
                 (path_info.pathNature == PathNature.folder_without_index) | \
                 (path_info.pathNature == PathNature.md_file):
-            return self.return_wiki_page(path_info, Path(path_info.path_on_disk), path_info.url_items)
+            return self.return_wiki_page(path_info)
         elif path_info.pathNature == PathNature.folder_without_index:
             print('PathNature folder without index : TODO 3')
             abort(500)
@@ -54,21 +53,26 @@ class WikiView(View):
             print('PathNature default case -> 500')
             abort(500)
 
-    def return_wiki_page(self, path_info: PathInfo, page_path_on_disk: Path, path_elements: list[str]) -> str:
+    # TODO path_element is in the path_info, we should remove this argument!
+    def return_wiki_page(self, path_info: PathInfo) -> str:
+
+        page_path_on_disk: Path = path_info.path_on_disk
+        path_elements: list[Any] = path_info.url_items
 
         print("Enter return_wiki_page")
         print(f"    path_info = {path_info}")
         print(f"    page_path_on_disk = {page_path_on_disk}")
         print(f"    path_elements={path_elements}")
 
-        toc_content, html_content = None, None
+
+        # toc_content, html_content = None, None
         match path_info.pathNature:
             case PathNature.folder_without_index:
-                toc_content, html_content = self.page_renderer.render_folder_without_index(path_on_disk=page_path_on_disk)
+                rendered_page: RenderedPage = self.page_renderer.render_folder_without_index(path_on_disk=page_path_on_disk)
             case PathNature.folder_with_index:
-                toc_content, html_content = self.page_renderer.render_page(path_on_disk=page_path_on_disk / "index.md")
+                rendered_page: RenderedPage = self.page_renderer.render_page(path_on_disk=page_path_on_disk / "index.md")
             case PathNature.md_file:
-                toc_content, html_content = self.page_renderer.render_page(path_on_disk=page_path_on_disk)
+                rendered_page: RenderedPage = self.page_renderer.render_page(path_on_disk=page_path_on_disk)
 
         breadcrumb_content = self.breadcrumb_renderer.render_path(path_elements)
         relative_to_root = ".."
@@ -81,7 +85,8 @@ class WikiView(View):
         print(f"    Sidebar Content:\n{sidebar_content}")
         return render_template(self.index_template,
                                relative_to_root=relative_to_root,
-                               content=html_content,
+                               title=rendered_page.title,
+                               content=rendered_page.html,
                                sidebar=sidebar_content,
-                               table_of_content=toc_content,
+                               table_of_content=rendered_page.toc,
                                breadcrumb=breadcrumb_content)
