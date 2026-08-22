@@ -4,7 +4,12 @@ const util = require('util');
 const autoprefixer = require('autoprefixer')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const miniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
+/* Extract MathJax folder to copy it */
+const mathJaxDirectory = path.dirname(
+    require.resolve('mathjax/package.json')
+);
 const devTemplatesFolder = path.resolve(__dirname, "sample-templates");
 
 var config = {
@@ -89,6 +94,15 @@ function buildPlugins(mode) {
     return [
         buildHtmlWebpackPlugin(mode),
         new miniCssExtractPlugin(),
+        new CopyPlugin({
+            /* We don't put MathJax in the bundle, so we need to copy it */
+            patterns: [
+                {
+                    from: mathJaxDirectory,
+                    to: 'mathjax',
+                },
+            ],
+        }),
     ]
 }
 
