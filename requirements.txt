@@ -8,3 +8,4 @@ granian==2.7.4
 mdx_breakless_lists==1.0.1
 pytest==9.0.3
 python-frontmatter==1.3.0
+pyyaml==6.0.3
