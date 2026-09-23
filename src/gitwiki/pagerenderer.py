@@ -37,7 +37,9 @@ class PageRenderer:
                                                                                 end_url=''),
                                                            GitWikiMermaidExtension(),
                                                            GitWikiMathJaxExtension()])
-        toc_content = self.toc_ext.toc
+        toc_content = ""
+        if "toc" in self.toc_ext:
+            toc_content = self.toc_ext.toc
         if "title" in metadata:
             title = str(metadata['title'])
         else:

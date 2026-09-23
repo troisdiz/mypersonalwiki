@@ -3,6 +3,17 @@ from pathlib import Path
 
 import yaml
 
+"""
+GitWiki CLI Config file typical content:
+
+---
+locations:
+ # Format of the id is not important, can be any string
+ - id: abc1-def2-ghi3
+ # Path of the pages repository root directory
+   path: ~/pages/
+
+"""
 
 @dataclass(frozen=True)
 class GitWikiLocation:

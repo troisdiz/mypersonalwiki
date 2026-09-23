@@ -82,7 +82,7 @@ class WikiView(View):
 
         sidebar_content = self.sidebar_renderer.render_sidebar(children)
 
-        print(f"    Sidebar Content:\n{sidebar_content}")
+        print(f"    Sidebar Content:#\n{sidebar_content}\n#")
         return render_template(self.index_template,
                                relative_to_root=relative_to_root,
                                title=rendered_page.title,

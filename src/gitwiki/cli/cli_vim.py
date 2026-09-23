@@ -17,9 +17,8 @@ class GitWikiVimHander:
         )
         if result.returncode != 0:
             raise RuntimeError("Could not run gvim")
-
-        for line in result.stdout:
-            if line == self.server_name:
+        for line in result.stdout.splitlines():
+            if line == self.server_name.upper():
                 return True
         return False
 
