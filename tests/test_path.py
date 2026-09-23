@@ -2,6 +2,7 @@ import unittest
 import tempfile
 import os
 import time
+from collections import deque
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -38,8 +39,8 @@ class TestGitWikiPathUrls(unittest.TestCase):
             relative_file_path = file_path[1:]
 
         full_path = os.path.join(self.temp_dir.name, relative_file_path)
-        print('Temp dir : #' + self.temp_dir.name + '#')
-        print('About to create : #' + full_path + '#')
+        #print('Temp dir : #' + self.temp_dir.name + '#')
+        #print('About to create : #' + full_path + '#')
         basedir = os.path.dirname(full_path)
         if not os.path.exists(basedir):
             os.makedirs(basedir)
@@ -48,10 +49,44 @@ class TestGitWikiPathUrls(unittest.TestCase):
 
     def print_folder_structure(self):
         print(f"Futur debug tool exploring {self.temp_dir.name}")
+        self.print_folder(self.temp_folder_path, 0)
+
+    def print_folder(self, folder: Path, depth: int):
+
+        print(f"{'':{2 * depth}}D {folder.name}")
+        sub_files: list[Path] = []
+        sub_folders: list[Path] = []
+        for item in folder.iterdir():
+            if item.is_dir():
+                sub_folders.append(item)
+            elif item.is_file():
+                sub_files.append(item)
+            else:
+                self.fail(f"Neither folder nor file: {item}")
+        for item in sub_folders:
+            self.print_folder(item, depth + 1)
+        for item in sub_files:
+            print(f"{'':{2 * (depth+1)}}F {item.name}")
+
+    def test_path_debug_print(self):
+        print()
+        url = '/d1/d11/f1.md'
+        self.ensure_file_presence(url)
+        url = '/d1/d11/f2.md'
+        self.ensure_file_presence(url)
+        url = '/d1/d12/f3.md'
+        self.ensure_file_presence(url)
+        url = '/d2/tutu/'
+        self.ensure_file_presence(url + 'index.md')
+        self.print_folder_structure()
 
     def test_path_info_from_url_for_folder_with_index(self):
+        print()
+        url = '/toto/tutu'
         url = '/toto/tutu/'
         self.ensure_file_presence(url + 'index.md')
+        self.print_folder_structure()
+
         path_info: PathInfo = self.path_manager.get_path_info_from_url(url)
         print(f"PathInfo: {path_info}")
         self.assertEqual(self.temp_folder_path / url[1:], path_info.path_on_disk)
@@ -160,6 +195,31 @@ class TestGitWikiPathUrls(unittest.TestCase):
         for sibling_path in sibling_paths:
             print(str(sibling_path))
         print("Siblings END")
+
+    def test_get_siblings_for_root__without_index(self):
+        url0 = '/'
+        url1 = '/toto/ind1'
+        url2 = '/tutu/ind2'
+        self.ensure_file_presence(url1 + ".md")
+        self.ensure_file_presence(url2 + ".md")
+
+        self.print_folder_structure()
+
+        path_info0: PathInfo = self.path_manager.get_path_info_from_url(url0)
+        path_info_toto: PathInfo = self.path_manager.get_path_info_from_url("/toto/")
+
+        sibling_paths: list[tuple[PathInfo, bool]] = self.path_manager.get_sibling_paths(path_info0)
+        print("\nSiblings START")
+        for sibling_path in sibling_paths:
+            print(str(sibling_path))
+        print("Siblings END")
+
+        self.assertEqual(4, len(sibling_paths), "There should be 5 sibling path + itself")
+        self.assertEqual(path_info_toto, sibling_paths[3][0])
+        #self.assertTrue(sibling_paths[1][1])
+
+
+
 
     def test_relative(self):
         sub_path = Path("/toto/tutu/titi.md")
