@@ -36,9 +36,6 @@ class WikiView(View):
             # TODO customize page (give path ?)
             print('PathNature not found -> 404')
             abort(404)
-        elif path_info.pathNature == PathNature.other_resource_not_found:
-            print('PathNature other resource not found -> 404')
-            abort(404)
         elif path_info.pathNature == PathNature.other_resource_file:
             # TODO mime type
             return send_file(path_info.path_on_disk, mimetype='image/png')

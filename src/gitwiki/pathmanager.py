@@ -18,11 +18,10 @@ URL_CHARACTER_SEPARATOR = '/'
 @unique
 class PathNature(Enum):
     not_found = 0
-    other_resource_not_found = 1
-    md_file = 2  # to be rendered as html (otherwise, use other_resource_file
-    other_resource_file = 3
-    folder_without_index = 4
-    folder_with_index = 5
+    md_file = 1  # to be rendered as html (otherwise, use other_resource_file
+    other_resource_file = 2
+    folder_without_index = 3
+    folder_with_index = 4
     sidebar = 6  # TODO use it!
 
     def can_have_children(self) -> bool:
@@ -41,7 +40,6 @@ class PathInfo:
         self.path_on_disk: Path = path_on_disk
 
         if path_nature is not PathNature.not_found and \
-                path_nature is not PathNature.other_resource_not_found and \
                 path_on_disk is None:
             raise Exception(f"cannot create PathInfo because path_on_disk is None (url_items = {str(url_items)}")
 
@@ -134,21 +132,6 @@ class MalFormedGitWikiUrl(Exception):
         self.message = message
 
 
-#     def canonize(self) -> 'GitWikiUrl':
-#         path_elements = self.path_elements
-#         while True:
-#             try:
-#                 index = path_elements.index('..')
-#                 if index <= 0:
-#                     if self.is_absolute:
-#                         raise MalFormedGitWikiUrl('Too much ..')
-#                     else:
-#                         break
-#                 path_elements = path_elements[:index - 1] + path_elements[index + 1:]
-#             except ValueError:
-#                 break
-#         return GitWikiUrl(self.is_absolute, path_elements)
-
 class TemplateManager:
     def __init__(self, templates_base_path: Path):
         self.templates_path = join(templates_base_path, 'templates')
@@ -202,7 +185,7 @@ class PathManager:
     def get_sibling_paths(self, path_info: PathInfo) -> list[tuple[PathInfo, bool]]:
         source_path = path_info.path_on_disk
         parent_path_on_disk = path_info.path_on_disk
-        if not path_info.pathNature == PathNature.folder_with_index:
+        if not path_info.pathNature in [PathNature.folder_with_index, PathNature.folder_without_index]:
             parent_path_on_disk = parent_path_on_disk.parent
         children = [item for item in parent_path_on_disk.iterdir()
                     if item.suffix == ".md" or (item.is_dir() and not item.name.startswith("."))]
@@ -338,24 +321,20 @@ class PathManager:
         last_elt = raw_path_elts[-1]
         file_parent_url_items = cleaned_path_elts[:-1]
         file_elts = last_elt.split('.')
-        extension = file_elts[-1]
-        if len(file_elts) == 1:
-            # No extension
-            path_nature = None
-            potential_md_path = self.base_pathlib_path / f"{unslashed_decoded_url_path}.md"
-            if potential_md_path.exists():
-                if potential_md_path.name == "index.md":
-                    folder_with_index_path = potential_md_path.parent
-                    return PathInfo(path_nature=PathNature.folder_with_index,
-                                    path_on_disk=folder_with_index_path,
-                                    url_items=cleaned_path_elts[:-1])
-                return PathInfo(path_nature=PathNature.md_file,
-                                path_on_disk=Path(potential_md_path),
-                                url_items=cleaned_path_elts)
-            else:
-                return PathInfo(path_nature=PathNature.not_found,
-                                path_on_disk=None,
-                                url_items=cleaned_path_elts)
+        potential_md_path = self.base_pathlib_path / f"{unslashed_decoded_url_path}.md"
+        if potential_md_path.exists():
+            if potential_md_path.name == "index.md":
+                folder_with_index_path = potential_md_path.parent
+                return PathInfo(path_nature=PathNature.folder_with_index,
+                                path_on_disk=folder_with_index_path,
+                                url_items=cleaned_path_elts[:-1])
+            return PathInfo(path_nature=PathNature.md_file,
+                            path_on_disk=Path(potential_md_path),
+                            url_items=cleaned_path_elts)
+        #else:
+        #    return PathInfo(path_nature=PathNature.not_found,
+        #                    path_on_disk=None,
+        #                    url_items=cleaned_path_elts)
         else:
             absolute_md_path = self.base_pathlib_path / unslashed_decoded_url_path
             if absolute_md_path.exists():
@@ -363,7 +342,7 @@ class PathManager:
                                 path_on_disk=absolute_md_path,
                                 url_items=file_parent_url_items)
             else:
-                return PathInfo(path_nature=PathNature.other_resource_not_found,
+                return PathInfo(path_nature=PathNature.not_found,
                                 path_on_disk=None,
                                 url_items=file_parent_url_items)
 
