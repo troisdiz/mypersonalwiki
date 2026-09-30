@@ -128,7 +128,7 @@ class TestGitWikiPathUrls(unittest.TestCase):
     def test_path_info_from_url_for_other_resource_not_found(self):
         url = '/test-not-found.jpg'
         path_info = self.path_manager.get_path_info_from_url(url)
-        self.assertEqual(PathNature.other_resource_not_found, path_info.pathNature)
+        self.assertEqual(PathNature.not_found, path_info.pathNature)
 
     def test_path_info_from_url_file_with_dots(self):
         file_name = "2020-04-02-PL-0.2.2-security"
