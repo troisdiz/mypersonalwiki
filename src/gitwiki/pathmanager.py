@@ -202,7 +202,7 @@ class PathManager:
     def get_sibling_paths(self, path_info: PathInfo) -> list[tuple[PathInfo, bool]]:
         source_path = path_info.path_on_disk
         parent_path_on_disk = path_info.path_on_disk
-        if not path_info.pathNature == PathNature.folder_with_index:
+        if not path_info.pathNature in [PathNature.folder_with_index, PathNature.folder_without_index]:
             parent_path_on_disk = parent_path_on_disk.parent
         children = [item for item in parent_path_on_disk.iterdir()
                     if item.suffix == ".md" or (item.is_dir() and not item.name.startswith("."))]
@@ -338,7 +338,6 @@ class PathManager:
         last_elt = raw_path_elts[-1]
         file_parent_url_items = cleaned_path_elts[:-1]
         file_elts = last_elt.split('.')
-        extension = file_elts[-1]
         if len(file_elts) == 1:
             # No extension
             path_nature = None
