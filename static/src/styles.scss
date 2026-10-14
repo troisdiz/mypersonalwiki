@@ -20,3 +20,9 @@ td.linenos {
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* IE/Edge */
 }
+
+table:not([codehilite]) {
+  @extend .table;
+  @extend .table-hover;
+  @extend .table-bordered;
+}
