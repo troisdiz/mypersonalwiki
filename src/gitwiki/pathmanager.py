@@ -190,22 +190,24 @@ class PathManager:
         children = [item for item in parent_path_on_disk.iterdir()
                     if item.suffix == ".md" or (item.is_dir() and not item.name.startswith("."))]
 
-        # dir
+        # dir first
+        # md files next
+        # all in alphabetical order
         def compare_func(p1: Path, p2: Path):
             if p1.is_dir() and p2.is_dir():
                 if p1.name == p2.name:
                     return 0
                 elif p1.name > p2.name:
-                    return -1
-                else:
                     return 1
+                else:
+                    return -1
             elif p1.is_file() and p2.is_file():
                 if p1.name == p2.name:
                     return 0
                 elif p1.name > p2.name:
-                    return -1
-                else:
                     return 1
+                else:
+                    return -1
             elif p1.is_file() and p2.is_dir():
                 return -1
             else:
