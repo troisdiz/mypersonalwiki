@@ -16,15 +16,15 @@ class SidebarRenderer:
             url_relative_path: str = self.path_manager.url_from_path(element[0])
             title = self.path_manager.title_from_path(element[0])
             if element[0].is_folder():
-                prefix = "<i class=\"bi bi-folder\"></i>"
-                suffix = "/"
+                rendering_prefix = "<i class=\"bi bi-folder\"></i>"
+                rendering_suffix = "/"
             else:
-                prefix = ""
-                suffix = ""
+                rendering_prefix = ""
+                rendering_suffix = ""
             if element[1]:
-                rendered_title = f"<span style=\"font-weight: bold;\">{prefix}{title}{suffix}</span>"
+                rendered_title = f"<span style=\"font-weight: bold;\">{rendering_prefix}{title}{rendering_suffix}</span>"
             else:
-                rendered_title = f"{prefix}{title}{suffix}"
+                rendered_title = f"{rendering_prefix}{title}{rendering_suffix}"
             sidebar_content += f"<li><a class=\"wikilink\" href=\"{url_relative_path}\">{rendered_title}</a></li>\n"
         sidebar_content += "</ul>\n"
         print(f"Found {len(elements)} siblings")
