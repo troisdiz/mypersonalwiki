@@ -4,6 +4,7 @@ from pathlib import Path
 import frontmatter
 import markdown
 from markdown.extensions.codehilite import CodeHiliteExtension
+from markdown.extensions.tables import TableExtension
 
 from gitwiki.extensions.gitwikilinks import GitWikiLinkExtension
 from gitwiki.extensions.gitwikimaths import GitWikiMathJaxExtension
@@ -30,13 +31,15 @@ class PageRenderer:
         with path_on_disk.open(mode="r", encoding="utf-8") as input_file:
             metadata, content = frontmatter.parse(input_file.read())
 
-        html_content = markdown.markdown(content, extensions=[CodeHiliteExtension(cssclass='codehilite card', linenums=True),
+        html_content = markdown.markdown(content, extensions=[CodeHiliteExtension(cssclass='codehilite', linenums=True),
                                                            'markdown.extensions.fenced_code',
+                                                           TableExtension(use_align_attribute=True),
                                                            self.toc_ext,
                                                            GitWikiLinkExtension(base_url=self.base_url,
                                                                                 end_url=''),
                                                            GitWikiMermaidExtension(),
-                                                           GitWikiMathJaxExtension()])
+                                                           GitWikiMathJaxExtension(),
+                                                           'mdx_breakless_lists'])
         toc_content = self.toc_ext.toc
         if "title" in metadata:
             title = str(metadata['title'])
